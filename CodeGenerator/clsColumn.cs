@@ -33,7 +33,7 @@ namespace CodeGenerator
                     case "decimal":
                         return "-1";
                     case "byte":
-                        return "-1";
+                        return "0";
                     case "bool":
                         return "false";
                     case "DateTime":

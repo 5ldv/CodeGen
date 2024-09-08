@@ -1,5 +1,6 @@
 ﻿using CodeGenerator;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Text;
 
 namespace CodeGenerator
@@ -12,12 +13,13 @@ namespace CodeGenerator
         string _DatabaseName;
         string _TableSingularName;
         string _TableName;
+        string _BusinessClassName;
+        string _DataClassName;
         public clsBusinessLayerGenerator(List<clsColumn> TableColumns, string TableName, string DatabaseName)
         {
             _TableName = TableName;
             _DatabaseName = DatabaseName;
             _ColumnsList = TableColumns;
-
             foreach (clsColumn Column in TableColumns)
             {
                 if (Column.IsPrimaryKey)
@@ -25,6 +27,44 @@ namespace CodeGenerator
             }
 
             _TableSingularName = _PrimaryKeyColumn.ColumnName.Substring(0, _PrimaryKeyColumn.ColumnName.Length - 2);
+            _BusinessClassName = "cls" + _TableSingularName;
+            _DataClassName = "cls" + _TableSingularName + "Data";
+        }
+        private string _GetParameterList(bool WithPrimaryKey, bool WithReferences, bool WithDataType = true, string Prefix = "", bool AssigningValues = false)
+        {
+            string ParameterList = "";
+            if (WithPrimaryKey)
+            {
+                if (WithDataType)
+                    ParameterList = _PrimaryKeyColumn.ColumnDataType + " ";
+
+                ParameterList += _PrimaryKeyColumn.ColumnName + ", ";
+            }
+
+            foreach (clsColumn Column in _ColumnsList)
+            {
+                if (Column.IsPrimaryKey)
+                    continue;
+
+                if (WithReferences)
+                    ParameterList += "ref ";
+
+                if (WithDataType)
+                    ParameterList += Column.ColumnDataType + " ";
+
+                if (AssigningValues)
+                    ParameterList += "                            " + Column.ColumnName + " = ";
+
+                ParameterList += Prefix + Column.ColumnName + ", ";
+
+                if (AssigningValues)
+                {
+                    ParameterList += "\n";
+
+                }
+            }
+
+            return ParameterList.Substring(0, ParameterList.Length - 2);
         }
         private StringBuilder _GetClassProperties()
         {
@@ -121,19 +161,38 @@ namespace CodeGenerator
             _sbBusinessClass.Append($"{Parameters.Substring(0, Parameters.Length - 2)});");
             _sbBusinessClass.Append("        }");
         }
-        private void _GenerateMethod_DeleteObject() {
+        private void _GenerateMethod_DeleteObject()
+        {
             _sbBusinessClass.Append($@"
         public static bool Delete{_TableSingularName}({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
         {{
             return clsPersonData.Delete{_TableSingularName}({_PrimaryKeyColumn.ColumnName}); 
         }}");
         }
-        private void _GenerateMethod_DoesObjectExist() {
+        private void _GenerateMethod_DoesObjectExist()
+        {
             _sbBusinessClass.Append($@"
         public static bool Does{_TableSingularName}Exist({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
         {{
            return clsPersonData.Does{_TableSingularName}Exist({_PrimaryKeyColumn.ColumnName});
         }}");
+        }
+        private void _GenerateMethod_Find()
+        {
+            _sbBusinessClass.AppendLine($"        public static {_BusinessClassName} Find({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})");
+            _sbBusinessClass.AppendLine("        {");
+
+            foreach (clsColumn Column in _ColumnsList)
+            {
+                if (!Column.IsPrimaryKey)
+                    _sbBusinessClass.AppendLine($"            {Column.ColumnDataType} {Column.ColumnName} = {Column.NullEquivalentValue};");
+            }
+            _sbBusinessClass.AppendLine($"            \nbool IsFound = {_DataClassName}.Get{_TableSingularName}ByID({_GetParameterList(true, true, false)});");
+            _sbBusinessClass.AppendLine($"            \nif(IsFound)");
+            _sbBusinessClass.AppendLine($"            return new {_BusinessClassName}({_GetParameterList(true, false, false)});");
+            _sbBusinessClass.AppendLine($"            else");
+            _sbBusinessClass.AppendLine($"            return null;");
+            _sbBusinessClass.Append("        }");
         }
         private void _GenerateSaveMethod()
         {
@@ -186,6 +245,7 @@ namespace CodeGenerator
             _GenerateUpdateObjectMethod();
             _GenerateMethod_DeleteObject();
             _GenerateMethod_DoesObjectExist();
+            _GenerateMethod_Find();
             _GenerateSaveMethod();
             _GenerateGetObjectsMethod();
             _GenerateClosingCurlyBrackets();
