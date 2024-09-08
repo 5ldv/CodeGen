@@ -83,8 +83,25 @@ namespace CodeGenerator
         }
         private void btnGenerateDataAccessLayer_Click(object sender, EventArgs e)
         {
-            string SelectedTable = lvTables.SelectedItems[0].Text;
+            if(cbDatabases.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a database before proceeding.", "Reminder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                cbDatabases.DroppedDown = true;
+                return;
+            }
+
+            if(lvTables.SelectedItems.Count == 0)
+            {
+                MessageBox.Show("Please select a table before proceeding.", "Reminder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+
             string SelectedDatabase = cbDatabases.SelectedItem.ToString();
+            string SelectedTable = lvTables.SelectedItems[0].Text;
+
+
+
             List<clsColumn> TableColumns = clsDatabase.GetColumnsOfTable(SelectedDatabase, SelectedTable);
 
             clsDataAccessLayerGenerator DALGenerator = new clsDataAccessLayerGenerator(TableColumns, SelectedTable, SelectedDatabase);
@@ -92,12 +109,32 @@ namespace CodeGenerator
         }
         private void btnGenerateDataAccessSettings_Click(object sender, EventArgs e)
         {
+            if(cbDatabases.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a database before proceeding.", "Reminder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                cbDatabases.DroppedDown = true;
+                return;
+            }
+
             string SelectedDatabase = cbDatabases.SelectedItem.ToString();
             string DataAccessSettingsClass = clsDataAccessLayerGenerator.GenerateDataAccessSettingsClass(SelectedDatabase).ToString();
             rtbCodeResult.Text = DataAccessSettingsClass;
         }
         private void btnGenerateBusinessLayer_Click(object sender, EventArgs e)
         {
+            if(cbDatabases.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a database before proceeding.", "Reminder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                cbDatabases.DroppedDown = true;
+                return;
+            }
+
+            if(lvTables.SelectedItems.Count == 0)
+            {
+                MessageBox.Show("Please select a table before proceeding.", "Reminder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             string SelectedTable = lvTables.SelectedItems[0].Text;
             string SelectedDatabase = cbDatabases.SelectedItem.ToString();
             List<clsColumn> TableColumns = clsDatabase.GetColumnsOfTable(SelectedDatabase, SelectedTable);
