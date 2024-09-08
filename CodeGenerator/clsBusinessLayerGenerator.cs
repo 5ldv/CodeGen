@@ -18,9 +18,9 @@ namespace CodeGenerator
             _DatabaseName = DatabaseName;
             _ColumnsList = TableColumns;
 
-            foreach(clsColumn Column in TableColumns)
+            foreach (clsColumn Column in TableColumns)
             {
-                if(Column.IsPrimaryKey)
+                if (Column.IsPrimaryKey)
                     _PrimaryKeyColumn = Column;
             }
 
@@ -30,7 +30,7 @@ namespace CodeGenerator
         {
             StringBuilder _sbProperties = new StringBuilder();
 
-            foreach(clsColumn column in _ColumnsList)
+            foreach (clsColumn column in _ColumnsList)
             {
                 _sbProperties.Append($"        public {column.ColumnDataType} {column.ColumnName} {{ set; get; }}\n");
             }
@@ -64,7 +64,7 @@ namespace CodeGenerator
         {
             _sbBusinessClass.Append($"        public cls{_TableSingularName}()\n");
             _sbBusinessClass.Append($"        {{");
-            foreach(clsColumn column in _ColumnsList)
+            foreach (clsColumn column in _ColumnsList)
             {
                 _sbBusinessClass.AppendLine($"this.{column.ColumnName} = {column.NullEquivalentValue};");
             }
@@ -75,13 +75,13 @@ namespace CodeGenerator
         {
             _sbBusinessClass.Append($"private cls{_TableSingularName}(");
             string Parameters = "";
-            foreach(clsColumn column in _ColumnsList)
+            foreach (clsColumn column in _ColumnsList)
             {
                 Parameters += $"{column.ColumnDataType} {column.ColumnName}, ";
             }
             _sbBusinessClass.Append(Parameters.Substring(0, Parameters.Length - 2) + ")");
             _sbBusinessClass.AppendLine("        {");
-            foreach(clsColumn column in _ColumnsList)
+            foreach (clsColumn column in _ColumnsList)
             {
                 _sbBusinessClass.AppendLine($"            this.{column.ColumnName} = {column.ColumnName};");
             }
@@ -95,9 +95,9 @@ namespace CodeGenerator
             string Primary = "";
             string Parameters = "";
 
-            foreach(clsColumn column in _ColumnsList)
+            foreach (clsColumn column in _ColumnsList)
             {
-                if(column.IsPrimaryKey)
+                if (column.IsPrimaryKey)
                     Primary = column.ColumnName;
 
                 Parameters += $"this.{column.ColumnName}, ";
@@ -114,12 +114,26 @@ namespace CodeGenerator
             _sbBusinessClass.AppendLine("        {");
             _sbBusinessClass.Append($"            return cls{_TableSingularName}.Update{_TableSingularName}(");
             string Parameters = "";
-            foreach(clsColumn column in _ColumnsList)
+            foreach (clsColumn column in _ColumnsList)
             {
                 Parameters += $"this.{column.ColumnName}, ";
             }
             _sbBusinessClass.Append($"{Parameters.Substring(0, Parameters.Length - 2)});");
             _sbBusinessClass.Append("        }");
+        }
+        private void _GenerateMethod_DeleteObject() {
+            _sbBusinessClass.Append($@"
+        public static bool Delete{_TableSingularName}({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
+        {{
+            return clsPersonData.Delete{_TableSingularName}({_PrimaryKeyColumn.ColumnName}); 
+        }}");
+        }
+        private void _GenerateMethod_DoesObjectExist() {
+            _sbBusinessClass.Append($@"
+        public static bool Does{_TableSingularName}Exist({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
+        {{
+           return clsPersonData.Does{_TableSingularName}Exist({_PrimaryKeyColumn.ColumnName});
+        }}");
         }
         private void _GenerateSaveMethod()
         {
@@ -170,6 +184,8 @@ namespace CodeGenerator
             _GenerateClassConstructor();
             _GenerateAddNewObjectMethod();
             _GenerateUpdateObjectMethod();
+            _GenerateMethod_DeleteObject();
+            _GenerateMethod_DoesObjectExist();
             _GenerateSaveMethod();
             _GenerateGetObjectsMethod();
             _GenerateClosingCurlyBrackets();

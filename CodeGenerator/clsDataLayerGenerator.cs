@@ -250,6 +250,72 @@ namespace CodeGenerator
             return (rowsAffected > 0);
         }}");
         }
+        private void _GenerateMethod_DeleteObject()
+        {
+            _sbDataAccessClass.Append($@"
+        public static bool Delete{_TableSingularName}({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
+        {{
+            int rowsAffected = 0;
+
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+            string query = @""Delete {_TableName} 
+                                where {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
+
+            SqlCommand command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue(""@{_PrimaryKeyColumn.ColumnName}"", {_PrimaryKeyColumn.ColumnName});
+
+            try
+            {{
+                connection.Open();
+                rowsAffected = command.ExecuteNonQuery();
+            }}
+            catch (Exception ex)
+            {{
+            }}
+            finally
+            {{
+                connection.Close();
+            }}
+
+            return (rowsAffected > 0);
+        }}");
+
+        }
+        private void _GenerateMethod_DoesObjectExist()
+        {
+            _sbDataAccessClass.Append($@"
+        public static bool Does{_TableSingularName}Exist({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
+        {{
+            bool isFound = false;
+
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+            string query = ""SELECT Found=1 FROM People WHERE {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
+
+            SqlCommand command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue(""@{_PrimaryKeyColumn.ColumnName}"", {_PrimaryKeyColumn.ColumnName});
+
+            try
+            {{
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+
+                isFound = reader.HasRows;
+
+                reader.Close();
+            }}
+            catch (Exception ex)
+            {{
+                isFound = false;
+            }}
+            finally
+            {{
+                connection.Close();
+            }}
+
+            return isFound;
+        }}
+");
+        }
         private void _GenerateMethod_GetAllObjects()
         {
             _sbDataAccessClass.Append($@" public static DataTable GetAll{_TableName}()
@@ -301,6 +367,8 @@ namespace CodeGenerator
             _GenerateFunction_GetObjectByID();
             _GenerateMethod_AddNewObject();
             _GenerateMethod_UpdateObject();
+            _GenerateMethod_DeleteObject();
+            _GenerateMethod_DoesObjectExist();
             _GenerateMethod_GetAllObjects();
             _GenerateClosingCurlyBrackets();
             return _sbDataAccessClass;
