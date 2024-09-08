@@ -81,37 +81,38 @@ namespace CodeGenerator
             }
 
         }
-
         private void btnGenerateDataAccessLayer_Click(object sender, EventArgs e)
         {
             string SelectedTable = lvTables.SelectedItems[0].Text;
             string SelectedDatabase = cbDatabases.SelectedItem.ToString();
             List<clsColumn> TableColumns = clsDatabase.GetColumnsOfTable(SelectedDatabase, SelectedTable);
 
-            clsDataLayerGenerator Generator = new clsDataLayerGenerator(TableColumns, SelectedTable, SelectedDatabase);
-            rtbCodeResult.Text = Generator.GenerateClass().ToString();
+            clsDataAccessLayerGenerator DALGenerator = new clsDataAccessLayerGenerator(TableColumns, SelectedTable, SelectedDatabase);
+            rtbCodeResult.Text = DALGenerator.GenerateClass().ToString();
         }
-
+        private void btnGenerateDataAccessSettings_Click(object sender, EventArgs e)
+        {
+            string SelectedDatabase = cbDatabases.SelectedItem.ToString();
+            string DataAccessSettingsClass = clsDataAccessLayerGenerator.GenerateDataAccessSettingsClass(SelectedDatabase).ToString();
+            rtbCodeResult.Text = DataAccessSettingsClass;
+        }
         private void btnGenerateBusinessLayer_Click(object sender, EventArgs e)
         {
             string SelectedTable = lvTables.SelectedItems[0].Text;
             string SelectedDatabase = cbDatabases.SelectedItem.ToString();
             List<clsColumn> TableColumns = clsDatabase.GetColumnsOfTable(SelectedDatabase, SelectedTable);
 
-            clsBusinessLayerGenerator Generator = new clsBusinessLayerGenerator(TableColumns, SelectedTable, SelectedDatabase);
-            rtbCodeResult.Text = Generator.GenerateClass().ToString();
+            clsBusinessLayerGenerator BLGenerator = new clsBusinessLayerGenerator(TableColumns, SelectedTable, SelectedDatabase);
+            rtbCodeResult.Text = BLGenerator.GenerateClass().ToString();
         }
-
         private void btnCopy_Click(object sender, EventArgs e)
         {
             Clipboard.SetText(rtbCodeResult.Text);
         }
-
         private void pbCloseForm_Click(object sender, EventArgs e)
         {
             this.Close();
         }
-
         private void pbMinimizeForm_Click(object sender, EventArgs e)
         {
             this.WindowState = FormWindowState.Minimized;
@@ -120,6 +121,5 @@ namespace CodeGenerator
         {
             MessageBox.Show("This Feature Not Implemented Yet", "Coming Soon");
         }
-
     }
 }

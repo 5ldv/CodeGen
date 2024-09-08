@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace CodeGenerator
 {
-    public class clsDataLayerGenerator
+    public class clsDataAccessLayerGenerator
     {
         StringBuilder _sbDataAccessClass = new StringBuilder();
         List<clsColumn> _ColumnsList = new List<clsColumn>();
@@ -18,15 +18,15 @@ namespace CodeGenerator
         string _DatabaseName;
         string _TableSingularName;
         string _TableName;
-        public clsDataLayerGenerator(List<clsColumn> TableColumns, string TableName, string DatabaseName)
+        public clsDataAccessLayerGenerator(List<clsColumn> TableColumns, string TableName, string DatabaseName)
         {
             _TableName = TableName;
             _DatabaseName = DatabaseName;
             _ColumnsList = TableColumns;
 
-            foreach (clsColumn Column in TableColumns)
+            foreach(clsColumn Column in TableColumns)
             {
-                if (Column.IsPrimaryKey)
+                if(Column.IsPrimaryKey)
                     _PrimaryKeyColumn = Column;
             }
 
@@ -35,31 +35,31 @@ namespace CodeGenerator
         private string _GetParameterList(bool WithPrimaryKey, bool WithReferences, bool WithDataType = true, string Prefix = "", bool AssigningValues = false)
         {
             string ParameterList = "";
-            if (WithPrimaryKey)
+            if(WithPrimaryKey)
             {
-                if (WithDataType)
+                if(WithDataType)
                     ParameterList = _PrimaryKeyColumn.ColumnDataType + " ";
 
                 ParameterList += _PrimaryKeyColumn.ColumnName + ", ";
             }
 
-            foreach (clsColumn Column in _ColumnsList)
+            foreach(clsColumn Column in _ColumnsList)
             {
-                if (Column.IsPrimaryKey)
+                if(Column.IsPrimaryKey)
                     continue;
 
-                if (WithReferences)
+                if(WithReferences)
                     ParameterList += "ref ";
 
-                if (WithDataType)
+                if(WithDataType)
                     ParameterList += Column.ColumnDataType + " ";
 
-                if (AssigningValues)
+                if(AssigningValues)
                     ParameterList += "                            " + Column.ColumnName + " = ";
 
                 ParameterList += Prefix + Column.ColumnName + ", ";
 
-                if (AssigningValues)
+                if(AssigningValues)
                 {
                     ParameterList += "\n";
 
@@ -90,12 +90,12 @@ namespace CodeGenerator
             StringBuilder sbGetObjectByIDFunction = new StringBuilder();
             StringBuilder sbAssignedColumns = new StringBuilder();
 
-            foreach (clsColumn Column in _ColumnsList)
+            foreach(clsColumn Column in _ColumnsList)
             {
-                if (Column.IsPrimaryKey)
+                if(Column.IsPrimaryKey)
                     continue;
 
-                if (Column.AllowNull)
+                if(Column.AllowNull)
                 {
                     sbAssignedColumns.Append($"\n\nif(reader[\"{Column.ColumnName}\"] != DBNull.Value)");
                     sbAssignedColumns.Append($"\n{Column.ColumnName} = ({Column.ColumnDataType})reader[\"{Column.ColumnName}\"];");
@@ -155,12 +155,12 @@ namespace CodeGenerator
         {
             StringBuilder sbCommandParameters = new StringBuilder();
 
-            foreach (clsColumn Column in _ColumnsList)
+            foreach(clsColumn Column in _ColumnsList)
             {
-                if (Column.IsPrimaryKey)
+                if(Column.IsPrimaryKey)
                     continue;
 
-                if (Column.AllowNull)
+                if(Column.AllowNull)
                     sbCommandParameters.Append($@"
 
             if ({Column.ColumnName} != {Column.NullEquivalentValue})
@@ -213,9 +213,9 @@ namespace CodeGenerator
             string AssigningValues = _GetParameterList(false, false, false, "@", true);
             StringBuilder sbCommandParameters = new StringBuilder();
 
-            foreach (clsColumn Column in _ColumnsList)
+            foreach(clsColumn Column in _ColumnsList)
             {
-                if (Column.IsPrimaryKey)
+                if(Column.IsPrimaryKey)
                     continue;
 
                 sbCommandParameters.Append($"command.Parameters.AddWithValue(\"@{Column.ColumnName}\", {Column.ColumnName});");
@@ -375,6 +375,20 @@ namespace CodeGenerator
             _GenerateClosingCurlyBrackets();
             return _sbDataAccessClass;
         }
+        public static StringBuilder GenerateDataAccessSettingsClass(string DatabaseName)
+        {
+            StringBuilder sbDataAccessSettingClass = new StringBuilder();
+            sbDataAccessSettingClass.Append($@"using System;
 
+namespace {DatabaseName}_DataAccess
+{{
+    static class clsDataAccessSettings
+    {{
+        public static string ConnectionString = ""Data Source=.;Integrated Security=True;TrustServerCertificate=True;"";
+    }}
+}}
+");
+            return sbDataAccessSettingClass;
+        }
     }
 }

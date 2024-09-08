@@ -8,7 +8,7 @@ namespace CodeGenerator
 {
     public class clsDataAccessSettings
     {
-        public static string ConnectionString = $"Data Source=.;Integrated Security=True;TrustServerCertificate=True;";
+        public static string ConnectionString = "Data Source=.;Integrated Security=True;TrustServerCertificate=True;";
     }
 
 }

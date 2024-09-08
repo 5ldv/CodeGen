@@ -40,14 +40,14 @@
             this.imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.rtbCodeResult = new System.Windows.Forms.RichTextBox();
             this.btnGenerateDataAccessLayer = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnGenerateDataAccessSettings = new System.Windows.Forms.Button();
             this.btnGenerateBusinessLayer = new System.Windows.Forms.Button();
             this.btnCopy = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.pbMinimizeForm = new System.Windows.Forms.PictureBox();
             this.pbCloseForm = new System.Windows.Forms.PictureBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.button2 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pbMinimizeForm)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbCloseForm)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -59,7 +59,7 @@
             this.cbDatabases.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cbDatabases.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(238)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
             this.cbDatabases.FormattingEnabled = true;
-            this.cbDatabases.Location = new System.Drawing.Point(61, 25);
+            this.cbDatabases.Location = new System.Drawing.Point(61, 24);
             this.cbDatabases.Margin = new System.Windows.Forms.Padding(5);
             this.cbDatabases.Name = "cbDatabases";
             this.cbDatabases.Size = new System.Drawing.Size(219, 29);
@@ -77,10 +77,10 @@
             this.lvTables.GridLines = true;
             this.lvTables.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lvTables.HideSelection = false;
-            this.lvTables.Location = new System.Drawing.Point(20, 72);
+            this.lvTables.Location = new System.Drawing.Point(20, 69);
             this.lvTables.MultiSelect = false;
             this.lvTables.Name = "lvTables";
-            this.lvTables.Size = new System.Drawing.Size(260, 584);
+            this.lvTables.Size = new System.Drawing.Size(260, 556);
             this.lvTables.TabIndex = 2;
             this.lvTables.UseCompatibleStateImageBehavior = false;
             this.lvTables.View = System.Windows.Forms.View.Details;
@@ -105,10 +105,10 @@
             this.listView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.listView1.HideSelection = false;
             this.listView1.LargeImageList = this.imageList1;
-            this.listView1.Location = new System.Drawing.Point(307, 72);
+            this.listView1.Location = new System.Drawing.Point(298, 69);
             this.listView1.MultiSelect = false;
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(482, 469);
+            this.listView1.Size = new System.Drawing.Size(498, 447);
             this.listView1.SmallImageList = this.imageList1;
             this.listView1.TabIndex = 2;
             this.listView1.UseCompatibleStateImageBehavior = false;
@@ -140,10 +140,10 @@
             // 
             this.rtbCodeResult.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(62)))), ((int)(((byte)(66)))));
             this.rtbCodeResult.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(238)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
-            this.rtbCodeResult.Location = new System.Drawing.Point(815, 72);
+            this.rtbCodeResult.Location = new System.Drawing.Point(815, 69);
             this.rtbCodeResult.Name = "rtbCodeResult";
             this.rtbCodeResult.ReadOnly = true;
-            this.rtbCodeResult.Size = new System.Drawing.Size(461, 469);
+            this.rtbCodeResult.Size = new System.Drawing.Size(461, 447);
             this.rtbCodeResult.TabIndex = 4;
             this.rtbCodeResult.Text = resources.GetString("rtbCodeResult.Text");
             // 
@@ -152,50 +152,37 @@
             this.btnGenerateDataAccessLayer.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(62)))), ((int)(((byte)(66)))));
             this.btnGenerateDataAccessLayer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnGenerateDataAccessLayer.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(238)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
-            this.btnGenerateDataAccessLayer.Location = new System.Drawing.Point(307, 556);
+            this.btnGenerateDataAccessLayer.Location = new System.Drawing.Point(298, 530);
             this.btnGenerateDataAccessLayer.Name = "btnGenerateDataAccessLayer";
-            this.btnGenerateDataAccessLayer.Size = new System.Drawing.Size(233, 42);
+            this.btnGenerateDataAccessLayer.Size = new System.Drawing.Size(242, 40);
             this.btnGenerateDataAccessLayer.TabIndex = 5;
-            this.btnGenerateDataAccessLayer.Text = "Generate Data Access Layer";
+            this.btnGenerateDataAccessLayer.Text = "Generate Data Access Class";
             this.btnGenerateDataAccessLayer.UseVisualStyleBackColor = false;
             this.btnGenerateDataAccessLayer.Click += new System.EventHandler(this.btnGenerateDataAccessLayer_Click);
             // 
-            // button2
+            // btnGenerateDataAccessSettings
             // 
-            this.button2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(62)))), ((int)(((byte)(66)))));
-            this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(238)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
-            this.button2.Location = new System.Drawing.Point(556, 614);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(233, 42);
-            this.button2.TabIndex = 5;
-            this.button2.Text = ".";
-            this.button2.UseVisualStyleBackColor = false;
-            this.button2.Click += new System.EventHandler(this.ShowNotImplementedYetMessage);
-            // 
-            // button1
-            // 
-            this.button1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(62)))), ((int)(((byte)(66)))));
-            this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(238)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
-            this.button1.Location = new System.Drawing.Point(556, 556);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(233, 42);
-            this.button1.TabIndex = 5;
-            this.button1.Text = ".";
-            this.button1.UseVisualStyleBackColor = false;
-            this.button1.Click += new System.EventHandler(this.ShowNotImplementedYetMessage);
+            this.btnGenerateDataAccessSettings.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(62)))), ((int)(((byte)(66)))));
+            this.btnGenerateDataAccessSettings.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnGenerateDataAccessSettings.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(238)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
+            this.btnGenerateDataAccessSettings.Location = new System.Drawing.Point(556, 530);
+            this.btnGenerateDataAccessSettings.Name = "btnGenerateDataAccessSettings";
+            this.btnGenerateDataAccessSettings.Size = new System.Drawing.Size(240, 40);
+            this.btnGenerateDataAccessSettings.TabIndex = 5;
+            this.btnGenerateDataAccessSettings.Text = "Generate Data Access Settings";
+            this.btnGenerateDataAccessSettings.UseVisualStyleBackColor = false;
+            this.btnGenerateDataAccessSettings.Click += new System.EventHandler(this.btnGenerateDataAccessSettings_Click);
             // 
             // btnGenerateBusinessLayer
             // 
             this.btnGenerateBusinessLayer.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(62)))), ((int)(((byte)(66)))));
             this.btnGenerateBusinessLayer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnGenerateBusinessLayer.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(238)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
-            this.btnGenerateBusinessLayer.Location = new System.Drawing.Point(307, 614);
+            this.btnGenerateBusinessLayer.Location = new System.Drawing.Point(298, 585);
             this.btnGenerateBusinessLayer.Name = "btnGenerateBusinessLayer";
-            this.btnGenerateBusinessLayer.Size = new System.Drawing.Size(233, 42);
+            this.btnGenerateBusinessLayer.Size = new System.Drawing.Size(242, 40);
             this.btnGenerateBusinessLayer.TabIndex = 5;
-            this.btnGenerateBusinessLayer.Text = "Generate Business Layer";
+            this.btnGenerateBusinessLayer.Text = "Generate Business Class";
             this.btnGenerateBusinessLayer.UseVisualStyleBackColor = false;
             this.btnGenerateBusinessLayer.Click += new System.EventHandler(this.btnGenerateBusinessLayer_Click);
             // 
@@ -204,9 +191,9 @@
             this.btnCopy.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(62)))), ((int)(((byte)(66)))));
             this.btnCopy.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCopy.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(238)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
-            this.btnCopy.Location = new System.Drawing.Point(815, 556);
+            this.btnCopy.Location = new System.Drawing.Point(815, 530);
             this.btnCopy.Name = "btnCopy";
-            this.btnCopy.Size = new System.Drawing.Size(461, 42);
+            this.btnCopy.Size = new System.Drawing.Size(461, 40);
             this.btnCopy.TabIndex = 5;
             this.btnCopy.Text = "Copy";
             this.btnCopy.UseVisualStyleBackColor = false;
@@ -217,9 +204,9 @@
             this.button3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(62)))), ((int)(((byte)(66)))));
             this.button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.button3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(238)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
-            this.button3.Location = new System.Drawing.Point(815, 614);
+            this.button3.Location = new System.Drawing.Point(815, 585);
             this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(461, 42);
+            this.button3.Size = new System.Drawing.Size(461, 40);
             this.button3.TabIndex = 5;
             this.button3.Text = ".";
             this.button3.UseVisualStyleBackColor = false;
@@ -228,9 +215,9 @@
             // pbMinimizeForm
             // 
             this.pbMinimizeForm.Image = global::CodeGen.Properties.Resources.minus;
-            this.pbMinimizeForm.Location = new System.Drawing.Point(1199, 24);
+            this.pbMinimizeForm.Location = new System.Drawing.Point(1199, 23);
             this.pbMinimizeForm.Name = "pbMinimizeForm";
-            this.pbMinimizeForm.Size = new System.Drawing.Size(33, 30);
+            this.pbMinimizeForm.Size = new System.Drawing.Size(33, 29);
             this.pbMinimizeForm.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbMinimizeForm.TabIndex = 6;
             this.pbMinimizeForm.TabStop = false;
@@ -239,9 +226,9 @@
             // pbCloseForm
             // 
             this.pbCloseForm.Image = global::CodeGen.Properties.Resources.remove;
-            this.pbCloseForm.Location = new System.Drawing.Point(1243, 24);
+            this.pbCloseForm.Location = new System.Drawing.Point(1243, 23);
             this.pbCloseForm.Name = "pbCloseForm";
-            this.pbCloseForm.Size = new System.Drawing.Size(33, 30);
+            this.pbCloseForm.Size = new System.Drawing.Size(33, 29);
             this.pbCloseForm.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pbCloseForm.TabIndex = 6;
             this.pbCloseForm.TabStop = false;
@@ -250,21 +237,34 @@
             // pictureBox1
             // 
             this.pictureBox1.Image = global::CodeGen.Properties.Resources.DB;
-            this.pictureBox1.Location = new System.Drawing.Point(20, 24);
+            this.pictureBox1.Location = new System.Drawing.Point(20, 23);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(33, 30);
+            this.pictureBox1.Size = new System.Drawing.Size(33, 29);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 6;
             this.pictureBox1.TabStop = false;
             this.pictureBox1.Click += new System.EventHandler(this.pbMinimizeForm_Click);
             // 
-            // CodeGen
+            // button2
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 21F);
+            this.button2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(62)))), ((int)(((byte)(66)))));
+            this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.button2.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(238)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
+            this.button2.Location = new System.Drawing.Point(556, 585);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(240, 40);
+            this.button2.TabIndex = 5;
+            this.button2.Text = ".";
+            this.button2.UseVisualStyleBackColor = false;
+            this.button2.Click += new System.EventHandler(this.ShowNotImplementedYetMessage);
+            // 
+            // frmCodeGen
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(62)))), ((int)(((byte)(62)))), ((int)(((byte)(66)))));
-            this.ClientSize = new System.Drawing.Size(1265, 681);
+            this.ClientSize = new System.Drawing.Size(1265, 649);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.pbMinimizeForm);
             this.Controls.Add(this.pbCloseForm);
@@ -272,19 +272,19 @@
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.btnCopy);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btnGenerateDataAccessSettings);
             this.Controls.Add(this.btnGenerateDataAccessLayer);
             this.Controls.Add(this.rtbCodeResult);
             this.Controls.Add(this.listView1);
             this.Controls.Add(this.lvTables);
             this.Controls.Add(this.cbDatabases);
             this.Cursor = System.Windows.Forms.Cursors.Default;
-            this.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Font = new System.Drawing.Font("Segoe UI Semibold", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(238)))), ((int)(((byte)(238)))), ((int)(((byte)(238)))));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(5);
-            this.Name = "CodeGen";
+            this.Name = "frmCodeGen";
             this.Opacity = 0.95D;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "CodeGen";
@@ -308,13 +308,13 @@
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.RichTextBox rtbCodeResult;
         private System.Windows.Forms.Button btnGenerateDataAccessLayer;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnGenerateDataAccessSettings;
         private System.Windows.Forms.Button btnGenerateBusinessLayer;
         private System.Windows.Forms.Button btnCopy;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.PictureBox pbCloseForm;
         private System.Windows.Forms.PictureBox pbMinimizeForm;
         private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Button button2;
     }
 }
