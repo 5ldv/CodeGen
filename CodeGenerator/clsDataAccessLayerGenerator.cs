@@ -12,54 +12,57 @@ namespace CodeGenerator
 {
     public class clsDataAccessLayerGenerator
     {
+        public string TableSingularName { get; }
+        public string TableName { get; }
+        public string TableClassName { get; }
         StringBuilder _sbDataAccessClass = new StringBuilder();
         List<clsColumn> _ColumnsList = new List<clsColumn>();
         clsColumn _PrimaryKeyColumn;
         string _DatabaseName;
-        string _TableSingularName;
-        string _TableName;
         public clsDataAccessLayerGenerator(List<clsColumn> TableColumns, string TableName, string DatabaseName)
         {
-            _TableName = TableName;
+            this.TableName = TableName;
             _DatabaseName = DatabaseName;
             _ColumnsList = TableColumns;
-
-            foreach(clsColumn Column in TableColumns)
+            foreach (clsColumn Column in TableColumns)
             {
-                if(Column.IsPrimaryKey)
+                if (Column.IsPrimaryKey)
                     _PrimaryKeyColumn = Column;
             }
 
-            _TableSingularName = _PrimaryKeyColumn.ColumnName.Substring(0, _PrimaryKeyColumn.ColumnName.Length - 2);
+            TableSingularName = _PrimaryKeyColumn.ColumnName.Substring(0, _PrimaryKeyColumn.ColumnName.Length - 2);
+            TableClassName = $"cls{TableSingularName}Data";
+
+
         }
         private string _GetParameterList(bool WithPrimaryKey, bool WithReferences, bool WithDataType = true, string Prefix = "", bool AssigningValues = false)
         {
             string ParameterList = "";
-            if(WithPrimaryKey)
+            if (WithPrimaryKey)
             {
-                if(WithDataType)
+                if (WithDataType)
                     ParameterList = _PrimaryKeyColumn.ColumnDataType + " ";
 
                 ParameterList += _PrimaryKeyColumn.ColumnName + ", ";
             }
 
-            foreach(clsColumn Column in _ColumnsList)
+            foreach (clsColumn Column in _ColumnsList)
             {
-                if(Column.IsPrimaryKey)
+                if (Column.IsPrimaryKey)
                     continue;
 
-                if(WithReferences)
+                if (WithReferences)
                     ParameterList += "ref ";
 
-                if(WithDataType)
+                if (WithDataType)
                     ParameterList += Column.ColumnDataType + " ";
 
-                if(AssigningValues)
+                if (AssigningValues)
                     ParameterList += "                            " + Column.ColumnName + " = ";
 
                 ParameterList += Prefix + Column.ColumnName + ", ";
 
-                if(AssigningValues)
+                if (AssigningValues)
                 {
                     ParameterList += "\n";
 
@@ -80,7 +83,7 @@ namespace CodeGenerator
         }
         private void _GenerateClassDeclaration()
         {
-            _sbDataAccessClass.Append($"\n   public class {"cls" + _TableSingularName + "Data"}\n    {{");
+            _sbDataAccessClass.Append($"\n   public class {TableClassName}\n    {{");
         }
         private void _GenerateFunction_GetObjectByID()
         {
@@ -90,12 +93,12 @@ namespace CodeGenerator
             StringBuilder sbGetObjectByIDFunction = new StringBuilder();
             StringBuilder sbAssignedColumns = new StringBuilder();
 
-            foreach(clsColumn Column in _ColumnsList)
+            foreach (clsColumn Column in _ColumnsList)
             {
-                if(Column.IsPrimaryKey)
+                if (Column.IsPrimaryKey)
                     continue;
 
-                if(Column.AllowNull)
+                if (Column.AllowNull)
                 {
                     sbAssignedColumns.Append($"\n\nif(reader[\"{Column.ColumnName}\"] != DBNull.Value)");
                     sbAssignedColumns.Append($"\n{Column.ColumnName} = ({Column.ColumnDataType})reader[\"{Column.ColumnName}\"];");
@@ -107,12 +110,12 @@ namespace CodeGenerator
             }
 
 
-            _sbDataAccessClass.Append($@"        public static bool Get{_TableSingularName}ByID({_GetParameterList(true, true)})
+            _sbDataAccessClass.Append($@"        public static bool Get{TableSingularName}ByID({_GetParameterList(true, true)})
             {{
                 bool isFound = false;
 
                 SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-                string query = ""SELECT * FROM {_TableName} WHERE {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
+                string query = ""SELECT * FROM {TableName} WHERE {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
 
                 SqlCommand command = new SqlCommand(query, connection);
                 command.Parameters.AddWithValue(""@{_PrimaryKeyColumn.ColumnName}"", {_PrimaryKeyColumn.ColumnName});
@@ -155,12 +158,12 @@ namespace CodeGenerator
         {
             StringBuilder sbCommandParameters = new StringBuilder();
 
-            foreach(clsColumn Column in _ColumnsList)
+            foreach (clsColumn Column in _ColumnsList)
             {
-                if(Column.IsPrimaryKey)
+                if (Column.IsPrimaryKey)
                     continue;
 
-                if(Column.AllowNull)
+                if (Column.AllowNull)
                     sbCommandParameters.Append($@"
 
             if ({Column.ColumnName} != {Column.NullEquivalentValue})
@@ -171,12 +174,12 @@ namespace CodeGenerator
                 else
                     sbCommandParameters.Append($"\ncommand.Parameters.AddWithValue(\"@{Column.ColumnName}\", {Column.ColumnName});");
             }
-            _sbDataAccessClass.Append($@"        public static int AddNew{_TableSingularName}({_GetParameterList(false, false)})
+            _sbDataAccessClass.Append($@"        public static int AddNew{TableSingularName}({_GetParameterList(false, false)})
         {{
             int {_PrimaryKeyColumn.ColumnName} = -1;
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = @""INSERT INTO {_TableName} ({_GetParameterList(false, false, false)})
+            string query = @""INSERT INTO {TableName} ({_GetParameterList(false, false, false)})
                             VALUES ({_GetParameterList(false, false, false, "@")})
                             SELECT SCOPE_IDENTITY();"";
 
@@ -213,20 +216,20 @@ namespace CodeGenerator
             string AssigningValues = _GetParameterList(false, false, false, "@", true);
             StringBuilder sbCommandParameters = new StringBuilder();
 
-            foreach(clsColumn Column in _ColumnsList)
+            foreach (clsColumn Column in _ColumnsList)
             {
-                if(Column.IsPrimaryKey)
+                if (Column.IsPrimaryKey)
                     continue;
 
                 sbCommandParameters.Append($"command.Parameters.AddWithValue(\"@{Column.ColumnName}\", {Column.ColumnName});");
             }
 
-            _sbDataAccessClass.Append($@" public static bool Update{_TableSingularName}({_GetParameterList(true, false)})
+            _sbDataAccessClass.Append($@" public static bool Update{TableSingularName}({_GetParameterList(true, false)})
         {{
             int rowsAffected = 0;
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = @""UPDATE {_TableName}  
+            string query = @""UPDATE {TableName}  
                             SET 
 {AssigningValues.Substring(0, AssigningValues.Length - 1)}
                             WHERE {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
@@ -255,12 +258,12 @@ namespace CodeGenerator
         private void _GenerateMethod_DeleteObject()
         {
             _sbDataAccessClass.Append($@"
-        public static bool Delete{_TableSingularName}({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
+        public static bool Delete{TableSingularName}({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
         {{
             int rowsAffected = 0;
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = @""Delete {_TableName} 
+            string query = @""Delete {TableName} 
                                 where {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -286,7 +289,7 @@ namespace CodeGenerator
         private void _GenerateMethod_DoesObjectExist()
         {
             _sbDataAccessClass.Append($@"
-        public static bool Does{_TableSingularName}Exist({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
+        public static bool Does{TableSingularName}Exist({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
         {{
             bool isFound = false;
 
@@ -320,12 +323,12 @@ namespace CodeGenerator
         }
         private void _GenerateMethod_GetAllObjects()
         {
-            _sbDataAccessClass.Append($@" public static DataTable GetAll{_TableName}()
+            _sbDataAccessClass.Append($@" public static DataTable GetAll{TableName}()
             {{
                 DataTable dt = new DataTable();
 
                 SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-                string query = ""SELECT * FROM {_TableName}"";
+                string query = ""SELECT * FROM {TableName}"";
 
                 SqlCommand command = new SqlCommand(query, connection);
 

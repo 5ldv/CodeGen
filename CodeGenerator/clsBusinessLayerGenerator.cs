@@ -7,17 +7,17 @@ namespace CodeGenerator
 {
     public class clsBusinessLayerGenerator
     {
+        public string TableSingularName { get; }
+        public string TableName { get; }
+        public string TableClassName { get; }
         StringBuilder _sbBusinessClass = new StringBuilder();
         List<clsColumn> _ColumnsList = new List<clsColumn>();
         clsColumn _PrimaryKeyColumn;
         string _DatabaseName;
-        string _TableSingularName;
-        string _TableName;
-        string _BusinessClassName;
-        string _DataClassName;
+        string _DALClassName;
         public clsBusinessLayerGenerator(List<clsColumn> TableColumns, string TableName, string DatabaseName)
         {
-            _TableName = TableName;
+            this.TableName = TableName;
             _DatabaseName = DatabaseName;
             _ColumnsList = TableColumns;
             foreach (clsColumn Column in TableColumns)
@@ -26,9 +26,9 @@ namespace CodeGenerator
                     _PrimaryKeyColumn = Column;
             }
 
-            _TableSingularName = _PrimaryKeyColumn.ColumnName.Substring(0, _PrimaryKeyColumn.ColumnName.Length - 2);
-            _BusinessClassName = "cls" + _TableSingularName;
-            _DataClassName = "cls" + _TableSingularName + "Data";
+            TableSingularName = _PrimaryKeyColumn.ColumnName.Substring(0, _PrimaryKeyColumn.ColumnName.Length - 2);
+            TableClassName = "cls" + TableSingularName;
+            _DALClassName = "cls" + TableSingularName + "Data";
         }
         private string _GetParameterList(bool WithPrimaryKey, bool WithReferences, bool WithDataType = true, string Prefix = "", bool AssigningValues = false)
         {
@@ -88,7 +88,7 @@ namespace CodeGenerator
         }
         private void _GenerateClassDeclaration()
         {
-            _sbBusinessClass.Append($"\n   public class {"cls" + _TableSingularName}\n    {{");
+            _sbBusinessClass.Append($"\n   public class {"cls" + TableSingularName}\n    {{");
         }
         private void _GenerateClassProperties()
         {
@@ -102,7 +102,7 @@ namespace CodeGenerator
         }
         private void _GenerateClassDefaultConstructor()
         {
-            _sbBusinessClass.Append($"        public cls{_TableSingularName}()\n");
+            _sbBusinessClass.Append($"        public cls{TableSingularName}()\n");
             _sbBusinessClass.Append($"        {{");
             foreach (clsColumn column in _ColumnsList)
             {
@@ -113,7 +113,7 @@ namespace CodeGenerator
         }
         private void _GenerateClassConstructor()
         {
-            _sbBusinessClass.Append($"private cls{_TableSingularName}(");
+            _sbBusinessClass.Append($"private cls{TableSingularName}(");
             string Parameters = "";
             foreach (clsColumn column in _ColumnsList)
             {
@@ -130,7 +130,7 @@ namespace CodeGenerator
         }
         private void _GenerateAddNewObjectMethod()
         {
-            _sbBusinessClass.AppendLine($"        private bool _AddNew{_TableSingularName}()");
+            _sbBusinessClass.AppendLine($"        private bool _AddNew{TableSingularName}()");
             _sbBusinessClass.AppendLine("        {");
             string Primary = "";
             string Parameters = "";
@@ -144,15 +144,15 @@ namespace CodeGenerator
             }
 
             _sbBusinessClass.Append($"            this.{Primary} = ");
-            _sbBusinessClass.AppendLine($"cls{_TableSingularName}Data.AddNew{_TableSingularName}({Parameters.Substring(0, Parameters.Length - 2)});");
+            _sbBusinessClass.AppendLine($"cls{TableSingularName}Data.AddNew{TableSingularName}({Parameters.Substring(0, Parameters.Length - 2)});");
             _sbBusinessClass.AppendLine($"            return (this.{Primary} != -1);");
             _sbBusinessClass.AppendLine("        }");
         }
         private void _GenerateUpdateObjectMethod()
         {
-            _sbBusinessClass.AppendLine($"        private bool _Update{_TableSingularName}()");
+            _sbBusinessClass.AppendLine($"        private bool _Update{TableSingularName}()");
             _sbBusinessClass.AppendLine("        {");
-            _sbBusinessClass.Append($"            return cls{_TableSingularName}.Update{_TableSingularName}(");
+            _sbBusinessClass.Append($"            return cls{TableSingularName}.Update{TableSingularName}(");
             string Parameters = "";
             foreach (clsColumn column in _ColumnsList)
             {
@@ -164,22 +164,22 @@ namespace CodeGenerator
         private void _GenerateMethod_DeleteObject()
         {
             _sbBusinessClass.Append($@"
-        public static bool Delete{_TableSingularName}({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
+        public static bool Delete{TableSingularName}({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
         {{
-            return clsPersonData.Delete{_TableSingularName}({_PrimaryKeyColumn.ColumnName}); 
+            return clsPersonData.Delete{TableSingularName}({_PrimaryKeyColumn.ColumnName}); 
         }}");
         }
         private void _GenerateMethod_DoesObjectExist()
         {
             _sbBusinessClass.Append($@"
-        public static bool Does{_TableSingularName}Exist({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
+        public static bool Does{TableSingularName}Exist({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
         {{
-           return clsPersonData.Does{_TableSingularName}Exist({_PrimaryKeyColumn.ColumnName});
+           return clsPersonData.Does{TableSingularName}Exist({_PrimaryKeyColumn.ColumnName});
         }}");
         }
         private void _GenerateMethod_Find()
         {
-            _sbBusinessClass.AppendLine($"        public static {_BusinessClassName} Find({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})");
+            _sbBusinessClass.AppendLine($"        public static {TableClassName} Find({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})");
             _sbBusinessClass.AppendLine("        {");
 
             foreach (clsColumn Column in _ColumnsList)
@@ -187,9 +187,9 @@ namespace CodeGenerator
                 if (!Column.IsPrimaryKey)
                     _sbBusinessClass.AppendLine($"            {Column.ColumnDataType} {Column.ColumnName} = {Column.NullEquivalentValue};");
             }
-            _sbBusinessClass.AppendLine($"            \nbool IsFound = {_DataClassName}.Get{_TableSingularName}ByID({_GetParameterList(true, true, false)});");
+            _sbBusinessClass.AppendLine($"            \nbool IsFound = {_DALClassName}.Get{TableSingularName}ByID({_GetParameterList(true, true, false)});");
             _sbBusinessClass.AppendLine($"            \nif(IsFound)");
-            _sbBusinessClass.AppendLine($"            return new {_BusinessClassName}({_GetParameterList(true, false, false)});");
+            _sbBusinessClass.AppendLine($"            return new {TableClassName}({_GetParameterList(true, false, false)});");
             _sbBusinessClass.AppendLine($"            else");
             _sbBusinessClass.AppendLine($"            return null;");
             _sbBusinessClass.Append("        }");
@@ -202,7 +202,7 @@ namespace CodeGenerator
             switch(Mode)
             {{
                 case enMode.AddNew:
-                    if(_AddNew{_TableSingularName}())
+                    if(_AddNew{TableSingularName}())
                     {{
                         Mode = enMode.Update;
                         return true;
@@ -213,7 +213,7 @@ namespace CodeGenerator
                     }}
 
                 case enMode.Update:
-                    return _Update{_TableSingularName}();
+                    return _Update{TableSingularName}();
             }}
             return false;
         }}");
@@ -222,9 +222,9 @@ namespace CodeGenerator
         private void _GenerateGetObjectsMethod()
         {
             _sbBusinessClass.Append($@"
-        public static DataTable Get{_TableName}()
+        public static DataTable Get{TableName}()
         {{
-            return cls{_TableSingularName}Data.Get{_TableName}();
+            return cls{TableSingularName}Data.Get{TableName}();
         }}
 ");
         }

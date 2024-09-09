@@ -1,4 +1,5 @@
-﻿using CodeGenerator;
+﻿using CodeGen;
+using CodeGenerator;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -157,6 +158,19 @@ namespace CodeGenerator
         private void ShowNotImplementedYetMessage(object sender, EventArgs e)
         {
             MessageBox.Show("This Feature Not Implemented Yet", "Coming Soon");
+        }
+
+        private void btnAdvancedGenerating_Click(object sender, EventArgs e)
+        {
+            if (cbDatabases.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a database before proceeding.", "Reminder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                cbDatabases.DroppedDown = true;
+                return;
+            }
+            string SelectedDatbase = cbDatabases.SelectedItem.ToString();
+            frmAdvancedGenerating frm = new frmAdvancedGenerating(SelectedDatbase);
+            frm.ShowDialog();
         }
     }
 }

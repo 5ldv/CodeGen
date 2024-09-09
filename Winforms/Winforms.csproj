@@ -46,14 +46,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="frmAdvancedGenerating.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAdvancedGenerating.Designer.cs">
+      <DependentUpon>frmAdvancedGenerating.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmCodeGen.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmCodeGen.Designer.cs">
       <DependentUpon>frmCodeGen.cs</DependentUpon>
     </Compile>
+    <Compile Include="Global\clsUtil.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="frmAdvancedGenerating.resx">
+      <DependentUpon>frmAdvancedGenerating.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmCodeGen.resx">
       <DependentUpon>frmCodeGen.cs</DependentUpon>
     </EmbeddedResource>
@@ -100,6 +110,12 @@
       <Project>{2ecdb1ca-6725-4fa1-b599-a6b71a83bb31}</Project>
       <Name>CodeGenerator</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\open-folder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\thunder.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
