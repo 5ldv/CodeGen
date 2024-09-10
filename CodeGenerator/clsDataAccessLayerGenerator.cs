@@ -64,7 +64,7 @@ namespace CodeGenerator
 
                 if (AssigningValues)
                 {
-                    ParameterList += "\n";
+                    ParameterList += "\r\n";
 
                 }
             }
@@ -73,24 +73,20 @@ namespace CodeGenerator
         }
         private void _GenerateUsings()
         {
-            _sbDataAccessClass.Append("using System;\n");
-            _sbDataAccessClass.Append("using System.Data;\n");
-            _sbDataAccessClass.Append("using System.Data.SqlClient;\n");
+            _sbDataAccessClass.Append("using System;\r\n");
+            _sbDataAccessClass.Append("using System.Data;\r\n");
+            _sbDataAccessClass.Append("using System.Data.SqlClient;\r\n");
         }
         private void _GenerateNamespace()
         {
-            _sbDataAccessClass.Append($"\nnamespace {_DatabaseName}_DataAccess\n{{");
+            _sbDataAccessClass.Append($"\r\nnamespace {_DatabaseName}_DataAccess\r\n{{");
         }
         private void _GenerateClassDeclaration()
         {
-            _sbDataAccessClass.Append($"\n   public class {TableClassName}\n    {{");
+            _sbDataAccessClass.AppendLine($"\r\n    public class {TableClassName}\r\n    {{");
         }
         private void _GenerateFunction_GetObjectByID()
         {
-            //
-            // DONT FORGET TO CHECK FOR NULLABLE AND DIFFRENET CASTING TYPES
-            // 
-            StringBuilder sbGetObjectByIDFunction = new StringBuilder();
             StringBuilder sbAssignedColumns = new StringBuilder();
 
             foreach (clsColumn Column in _ColumnsList)
@@ -100,58 +96,53 @@ namespace CodeGenerator
 
                 if (Column.AllowNull)
                 {
-                    sbAssignedColumns.Append($"\n\nif(reader[\"{Column.ColumnName}\"] != DBNull.Value)");
-                    sbAssignedColumns.Append($"\n{Column.ColumnName} = ({Column.ColumnDataType})reader[\"{Column.ColumnName}\"];");
-                    sbAssignedColumns.Append($"\nelse");
-                    sbAssignedColumns.Append($"\n{Column.ColumnName} = {Column.NullEquivalentValue};\n");
+                    sbAssignedColumns.Append($"\r\n\r\n                    if(reader[\"{Column.ColumnName}\"] != DBNull.Value)");
+                    sbAssignedColumns.Append($"\r\n                        {Column.ColumnName} = ({Column.ColumnDataType})reader[\"{Column.ColumnName}\"];");
+                    sbAssignedColumns.Append($"\r\n                    else");
+                    sbAssignedColumns.Append($"\r\n                        {Column.ColumnName} = {Column.NullEquivalentValue};\r\n");
                 }
                 else
-                    sbAssignedColumns.Append($"\n{Column.ColumnName} = ({Column.ColumnDataType})reader[\"{Column.ColumnName}\"];");
+                    sbAssignedColumns.Append($"\r\n                    {Column.ColumnName} = ({Column.ColumnDataType})reader[\"{Column.ColumnName}\"];");
             }
+            _sbDataAccessClass.AppendLine($@"        public static bool Get{TableSingularName}ByID({_GetParameterList(true, true)})
+        {{
+            bool isFound = false;
 
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+            string query = ""SELECT * FROM {TableName} WHERE {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
 
-            _sbDataAccessClass.Append($@"        public static bool Get{TableSingularName}ByID({_GetParameterList(true, true)})
+            SqlCommand command = new SqlCommand(query, connection);
+            command.Parameters.AddWithValue(""@{_PrimaryKeyColumn.ColumnName}"", {_PrimaryKeyColumn.ColumnName});
+
+            try
             {{
-                bool isFound = false;
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
 
-                SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-                string query = ""SELECT * FROM {TableName} WHERE {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
-
-                SqlCommand command = new SqlCommand(query, connection);
-                command.Parameters.AddWithValue(""@{_PrimaryKeyColumn.ColumnName}"", {_PrimaryKeyColumn.ColumnName});
-
-                try
+                if(reader.Read())
                 {{
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-
-                    if (reader.Read())
-                    {{
-                        isFound = true;
-             ");
-
-            _sbDataAccessClass.Append(sbAssignedColumns);
-
-            _sbDataAccessClass.Append($@"
-    }}
-                    else
-                    {{
-                        isFound = false;
-                    }}
-
-                    reader.Close();
+                    isFound = true;
+{sbAssignedColumns}
                 }}
-                catch (Exception ex)
+                else
                 {{
                     isFound = false;
                 }}
-                finally
-                {{
-                    connection.Close();
-                }}
 
-                return isFound;
-            }}");
+                reader.Close();
+            }}
+            catch(Exception ex)
+            {{
+                isFound = false;
+            }}
+            finally
+            {{
+                connection.Close();
+            }}
+
+            return isFound;
+        }}");
+         
 
         }
         private void _GenerateMethod_AddNewObject()
@@ -166,27 +157,25 @@ namespace CodeGenerator
                 if (Column.AllowNull)
                     sbCommandParameters.Append($@"
 
-            if ({Column.ColumnName} != {Column.NullEquivalentValue})
+            if({Column.ColumnName} != {Column.NullEquivalentValue})
                 command.Parameters.AddWithValue(""@{Column.ColumnName}"", {Column.ColumnName});
             else
-                command.Parameters.AddWithValue(""@{Column.ColumnName}"", DBNull.Value);
-");
+                command.Parameters.AddWithValue(""@{Column.ColumnName}"", DBNull.Value);");
                 else
-                    sbCommandParameters.Append($"\ncommand.Parameters.AddWithValue(\"@{Column.ColumnName}\", {Column.ColumnName});");
+                    sbCommandParameters.Append($"\r\n            command.Parameters.AddWithValue(\"@{Column.ColumnName}\", {Column.ColumnName});");
             }
-            _sbDataAccessClass.Append($@"        public static int AddNew{TableSingularName}({_GetParameterList(false, false)})
+            _sbDataAccessClass.AppendLine($@"        public static int AddNew{TableSingularName}({_GetParameterList(false, false)})
         {{
             int {_PrimaryKeyColumn.ColumnName} = -1;
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
             string query = @""INSERT INTO {TableName} ({_GetParameterList(false, false, false)})
-                            VALUES ({_GetParameterList(false, false, false, "@")})
+                            VALUES (@{_GetParameterList(false, false, false, "@")})
                             SELECT SCOPE_IDENTITY();"";
 
             SqlCommand command = new SqlCommand(query, connection);
-");
-            _sbDataAccessClass.Append(sbCommandParameters.ToString());
-            _sbDataAccessClass.Append($@"
+
+{sbCommandParameters}
 
             try
             {{
@@ -194,12 +183,12 @@ namespace CodeGenerator
 
                 object result = command.ExecuteScalar();
 
-                if (result != null && int.TryParse(result.ToString(), out int insertedID))
+                if(result != null && int.TryParse(result.ToString(), out int insertedID))
                 {{
                     {_PrimaryKeyColumn.ColumnName} = insertedID;
                 }}
             }}
-            catch (Exception ex)
+            catch(Exception ex)
             {{
 
             }}
@@ -210,6 +199,7 @@ namespace CodeGenerator
 
             return {_PrimaryKeyColumn.ColumnName};
         }}");
+
         }
         private void _GenerateMethod_UpdateObject()
         {
@@ -221,10 +211,10 @@ namespace CodeGenerator
                 if (Column.IsPrimaryKey)
                     continue;
 
-                sbCommandParameters.Append($"command.Parameters.AddWithValue(\"@{Column.ColumnName}\", {Column.ColumnName});");
+                sbCommandParameters.Append($"\r\n            command.Parameters.AddWithValue(\"@{Column.ColumnName}\", {Column.ColumnName});");
             }
 
-            _sbDataAccessClass.Append($@" public static bool Update{TableSingularName}({_GetParameterList(true, false)})
+            _sbDataAccessClass.AppendLine($@"        public static bool Update{TableSingularName}({_GetParameterList(true, false)})
         {{
             int rowsAffected = 0;
 
@@ -235,14 +225,14 @@ namespace CodeGenerator
                             WHERE {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
 
             SqlCommand command = new SqlCommand(query, connection);
-            {sbCommandParameters}
-           
+{sbCommandParameters}
+
             try
             {{
                 connection.Open();
                 rowsAffected = command.ExecuteNonQuery();
             }}
-            catch (Exception ex)
+            catch(Exception ex)
             {{
                 return false;
             }}
@@ -257,8 +247,7 @@ namespace CodeGenerator
         }
         private void _GenerateMethod_DeleteObject()
         {
-            _sbDataAccessClass.Append($@"
-        public static bool Delete{TableSingularName}({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
+            _sbDataAccessClass.AppendLine($@"        public static bool Delete{TableSingularName}({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
         {{
             int rowsAffected = 0;
 
@@ -274,7 +263,7 @@ namespace CodeGenerator
                 connection.Open();
                 rowsAffected = command.ExecuteNonQuery();
             }}
-            catch (Exception ex)
+            catch(Exception ex)
             {{
             }}
             finally
@@ -288,8 +277,7 @@ namespace CodeGenerator
         }
         private void _GenerateMethod_DoesObjectExist()
         {
-            _sbDataAccessClass.Append($@"
-        public static bool Does{TableSingularName}Exist({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
+            _sbDataAccessClass.AppendLine($@"        public static bool Does{TableSingularName}Exist({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
         {{
             bool isFound = false;
 
@@ -308,7 +296,7 @@ namespace CodeGenerator
 
                 reader.Close();
             }}
-            catch (Exception ex)
+            catch(Exception ex)
             {{
                 isFound = false;
             }}
@@ -318,50 +306,48 @@ namespace CodeGenerator
             }}
 
             return isFound;
-        }}
-");
+        }}");
         }
         private void _GenerateMethod_GetAllObjects()
         {
-            _sbDataAccessClass.Append($@" public static DataTable GetAll{TableName}()
+            _sbDataAccessClass.AppendLine($@"        public static DataTable GetAll{TableName}()
+        {{
+            DataTable dt = new DataTable();
+
+            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
+            string query = ""SELECT * FROM {TableName}"";
+
+            SqlCommand command = new SqlCommand(query, connection);
+
+            try
             {{
-                DataTable dt = new DataTable();
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
 
-                SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-                string query = ""SELECT * FROM {TableName}"";
-
-                SqlCommand command = new SqlCommand(query, connection);
-
-                try
+                if(reader.HasRows)
                 {{
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
-
-                    if (reader.HasRows)
-                    {{
-                        dt.Load(reader);
-                    }}
-
-                    reader.Close();
+                    dt.Load(reader);
                 }}
 
-                catch (Exception ex)
-                {{
-                    
-                }}
-                finally
-                {{
-                    connection.Close();
-                }}
-
-                return dt;
+                reader.Close();
             }}
-");
+
+            catch(Exception ex)
+            {{
+
+            }}
+            finally
+            {{
+                connection.Close();
+            }}
+
+            return dt;
+        }}");
 
         }
         private void _GenerateClosingCurlyBrackets()
         {
-            _sbDataAccessClass.AppendLine("     }");
+            _sbDataAccessClass.AppendLine("    }");
             _sbDataAccessClass.AppendLine("}");
         }
         public StringBuilder GenerateClass()

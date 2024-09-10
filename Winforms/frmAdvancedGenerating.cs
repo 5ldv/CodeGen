@@ -24,20 +24,21 @@ namespace CodeGen
             InitializeComponent();
             _SelectedDatabase = Database;
 
-            _Tables = clsDatabase.GetTablesOfDatabase(_SelectedDatabase);
-
-            foreach (string Table in _Tables)
-            {
-                this._DatabaseTables.Add(clsDatabase.GetColumnsOfTable(_SelectedDatabase, Table));
-            }
         }
         private void frmAdvancedGenerating_Load(object sender, EventArgs e)
         {
+
+            _Tables = clsDatabase.GetTablesOfDatabase(_SelectedDatabase);
+
+            foreach(string Table in _Tables)
+            {
+                this._DatabaseTables.Add(clsDatabase.GetColumnsOfTable(_SelectedDatabase, Table));
+            }
             lblSelectedDatabase.Text = _SelectedDatabase;
         }
         private void pbSelectFolder_Click(object sender, EventArgs e)
         {
-            if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
+            if(folderBrowserDialog.ShowDialog() == DialogResult.OK)
             {
                 _SelectedPath = folderBrowserDialog.SelectedPath;
                 txtFolderPath.Text = _SelectedPath;
@@ -46,7 +47,7 @@ namespace CodeGen
         }
         private void btnGenerateDAL_Click(object sender, EventArgs e)
         {
-            if (!clsDatabase.DoesDatabaseExist(_SelectedDatabase))
+            if(!clsDatabase.DoesDatabaseExist(_SelectedDatabase))
             {
                 MessageBox.Show("The selected database does not exist. Please choose a valid database.",
                        "Database Error",
@@ -54,7 +55,7 @@ namespace CodeGen
                        MessageBoxIcon.Error);
                 return;
             }
-            if (MessageBox.Show("Are you sure you want to create the Data Access Layer classes in the following folder?\n\n"
+            if(MessageBox.Show("Are you sure you want to create the Data Access Layer classes in the following folder?\n\n"
                                       + _SelectedPath,
                                       "Confirm Business Layer Generation",
                                       MessageBoxButtons.OKCancel,
@@ -66,14 +67,14 @@ namespace CodeGen
 
             int TableCounter = 0;
 
-            foreach (List<clsColumn> Table in _DatabaseTables)
+            foreach(List<clsColumn> Table in _DatabaseTables)
             {
                 clsDataAccessLayerGenerator DALGenerator = new clsDataAccessLayerGenerator(Table, _Tables[TableCounter], _SelectedDatabase);
                 StringBuilder Class = DALGenerator.GenerateClass();
 
-                if (!clsUtil.Createfile(_SelectedPath, DALGenerator.TableClassName + FileExtension, Class.ToString()))
+                if(!clsUtil.Createfile(_SelectedPath, DALGenerator.TableClassName + FileExtension, Class.ToString()))
                 {
-                    if (clsUtil.DoesFileExist(_SelectedPath, DALGenerator.TableClassName + FileExtension))
+                    if(clsUtil.DoesFileExist(_SelectedPath, DALGenerator.TableClassName + FileExtension))
                     {
                         MessageBox.Show("file with name (" + DALGenerator.TableClassName + FileExtension + ") already exists in the selected path. " +
                                         "Please remove existing file and try again.",
@@ -94,10 +95,10 @@ namespace CodeGen
                 }
                 TableCounter++;
             }
-           
+
             StringBuilder DataAccessClass = clsDataAccessLayerGenerator.GenerateDataAccessSettingsClass(_SelectedDatabase);
             clsUtil.Createfile(_SelectedPath, "DataAccessSettings" + FileExtension, DataAccessClass.ToString());
-            
+
             MessageBox.Show("Data Access Layer Classes have been successfully generated for all tables.",
                 "Success",
                 MessageBoxButtons.OK,
@@ -105,7 +106,7 @@ namespace CodeGen
         }
         private void btnGenerateBL_Click(object sender, EventArgs e)
         {
-            if (!clsDatabase.DoesDatabaseExist(_SelectedDatabase))
+            if(!clsDatabase.DoesDatabaseExist(_SelectedDatabase))
             {
                 MessageBox.Show("The selected database does not exist. Please choose a valid database.",
                        "Database Error",
@@ -113,7 +114,7 @@ namespace CodeGen
                        MessageBoxIcon.Error);
                 return;
             }
-            if (MessageBox.Show("Are you sure you want to create the Business Layer classes in the following folder?\n\n"
+            if(MessageBox.Show("Are you sure you want to create the Business Layer classes in the following folder?\n\n"
                           + _SelectedPath,
                           "Confirm Business Layer Generation",
                           MessageBoxButtons.OKCancel,
@@ -124,14 +125,14 @@ namespace CodeGen
 
             int TableCounter = 0;
 
-            foreach (List<clsColumn> Table in _DatabaseTables)
+            foreach(List<clsColumn> Table in _DatabaseTables)
             {
                 clsBusinessLayerGenerator BLGenerator = new clsBusinessLayerGenerator(Table, _Tables[TableCounter], _SelectedDatabase);
                 StringBuilder Class = BLGenerator.GenerateClass();
 
-                if (!clsUtil.Createfile(_SelectedPath, BLGenerator.TableClassName + FileExtension, Class.ToString()))
+                if(!clsUtil.Createfile(_SelectedPath, BLGenerator.TableClassName + FileExtension, Class.ToString()))
                 {
-                    if (clsUtil.DoesFileExist(_SelectedPath, BLGenerator.TableClassName + FileExtension))
+                    if(clsUtil.DoesFileExist(_SelectedPath, BLGenerator.TableClassName + FileExtension))
                     {
                         MessageBox.Show("file with name (" + BLGenerator.TableClassName + FileExtension + ") already exists in the selected path. " +
                                         "Please remove the existing file and try again.",
@@ -165,5 +166,7 @@ namespace CodeGen
         {
             this.Close();
         }
+
+
     }
 }

@@ -159,7 +159,6 @@ namespace CodeGenerator
         {
             MessageBox.Show("This Feature Not Implemented Yet", "Coming Soon");
         }
-
         private void btnAdvancedGenerating_Click(object sender, EventArgs e)
         {
             if (cbDatabases.SelectedItem == null)
