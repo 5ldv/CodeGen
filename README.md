@@ -2,6 +2,9 @@
 
 **CodeGen** is a C# code generator designed to streamline the development of data access and business layers for CRUD operations in a 3-tier architecture. This tool simplifies the process of building and managing the data access and business logic layers by automating the generation of code for Create, Read, Update, and Delete operations.
 
+## Demo:
+![CodeGen_akoL7xkw0h](https://github.com/user-attachments/assets/28517a18-ba03-4cdd-ace2-67ac58a5ce57)
+
 ## Features
 - **Data Access Layer Generation:** Automatically generates code for accessing your SQL Server database.
 - **Business Layer Generation:** Generates the business logic layer to handle CRUD operations.
