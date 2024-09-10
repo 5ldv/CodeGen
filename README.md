@@ -5,7 +5,7 @@
 ## Demo:
 ![CodeGen_akoL7xkw0h](https://github.com/user-attachments/assets/28517a18-ba03-4cdd-ace2-67ac58a5ce57)
 
-## Features
+## Features:
 - **Data Access Layer Generation:** Automatically generates code for accessing your SQL Server database.
 - **Business Layer Generation:** Generates the business logic layer to handle CRUD operations.
 - **Bulk Generation:** Efficiently generates code for entire database in under 15 seconds.
@@ -26,6 +26,6 @@ Open `CodeGen.sln` in Visual Studio and build the project.
 
 4. **Enojy skipping Donkeywork :)**
 
-## Contributing
+## Contributing:
 Contributions are welcome! If you have suggestions for improvements or bug fixes, please submit a pull request or open an issue on GitHub.
 
