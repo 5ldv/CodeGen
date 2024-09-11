@@ -55,6 +55,14 @@ namespace CodeGen
                        MessageBoxIcon.Error);
                 return;
             }
+            if(_SelectedPath == "")
+            {
+                MessageBox.Show("No destination folder has been selected. Please choose a folder to save the generated files.",
+                "Folder Selection Required",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning);
+                return;
+            }
             if(MessageBox.Show("Are you sure you want to create the Data Access Layer classes in the following folder?\n\n"
                                       + _SelectedPath,
                                       "Confirm Business Layer Generation",
@@ -63,7 +71,7 @@ namespace CodeGen
             {
                 return;
             }
-
+            
 
             int TableCounter = 0;
 
@@ -112,6 +120,14 @@ namespace CodeGen
                        "Database Error",
                        MessageBoxButtons.OK,
                        MessageBoxIcon.Error);
+                return;
+            }
+            if(_SelectedPath == "")
+            {
+                MessageBox.Show("No destination folder has been selected. Please choose a folder to save the generated files.",
+                "Folder Selection Required",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning);
                 return;
             }
             if(MessageBox.Show("Are you sure you want to create the Business Layer classes in the following folder?\n\n"
