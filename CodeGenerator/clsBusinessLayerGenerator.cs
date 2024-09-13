@@ -224,7 +224,7 @@ namespace CodeGenerator
             _sbBusinessClass.Append($@"
         public static DataTable Get{TableName}()
         {{
-            return cls{TableSingularName}Data.Get{TableName}();
+            return cls{TableSingularName}Data.GetAll{TableName}();
         }}
 ");
         }
