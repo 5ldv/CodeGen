@@ -373,7 +373,7 @@ namespace {DatabaseName}_DataAccess
 {{
     static class clsDataAccessSettings
     {{
-        public static string ConnectionString = ""Data Source=.;Integrated Security=True;TrustServerCertificate=True;"";
+        public static string ConnectionString = ""Data Source=.;Database={DatabaseName};Integrated Security=True;TrustServerCertificate=True;"";
     }}
 }}
 ");
