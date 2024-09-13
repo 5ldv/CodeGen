@@ -138,13 +138,15 @@ namespace CodeGenerator
             foreach (clsColumn column in _ColumnsList)
             {
                 if (column.IsPrimaryKey)
+                {
                     Primary = column.ColumnName;
-
+                    continue;
+                }
                 Parameters += $"this.{column.ColumnName}, ";
             }
 
             _sbBusinessClass.Append($"            this.{Primary} = ");
-            _sbBusinessClass.AppendLine($"cls{TableSingularName}Data.AddNew{TableSingularName}({Parameters.Substring(0, Parameters.Length - 2)});");
+            _sbBusinessClass.AppendLine($"({_PrimaryKeyColumn.ColumnDataType})cls{TableSingularName}Data.AddNew{TableSingularName}({Parameters.Substring(0, Parameters.Length - 2)});");
             _sbBusinessClass.AppendLine($"            return (this.{Primary} != -1);");
             _sbBusinessClass.AppendLine("        }");
         }
@@ -152,7 +154,7 @@ namespace CodeGenerator
         {
             _sbBusinessClass.AppendLine($"        private bool _Update{TableSingularName}()");
             _sbBusinessClass.AppendLine("        {");
-            _sbBusinessClass.Append($"            return cls{TableSingularName}.Update{TableSingularName}(");
+            _sbBusinessClass.Append($"            return cls{TableSingularName}Data.Update{TableSingularName}(");
             string Parameters = "";
             foreach (clsColumn column in _ColumnsList)
             {
@@ -166,7 +168,7 @@ namespace CodeGenerator
             _sbBusinessClass.Append($@"
         public static bool Delete{TableSingularName}({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
         {{
-            return clsPersonData.Delete{TableSingularName}({_PrimaryKeyColumn.ColumnName});
+            return cls{TableSingularName}Data.Delete{TableSingularName}({_PrimaryKeyColumn.ColumnName});
         }}");
         }
         private void _GenerateMethod_DoesObjectExist()
@@ -174,7 +176,7 @@ namespace CodeGenerator
             _sbBusinessClass.Append($@"
         public static bool Does{TableSingularName}Exist({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
         {{
-            return clsPersonData.Does{TableSingularName}Exist({_PrimaryKeyColumn.ColumnName});
+            return cls{TableSingularName}Data.Does{TableSingularName}Exist({_PrimaryKeyColumn.ColumnName});
         }}");
         }
         private void _GenerateMethod_Find()
