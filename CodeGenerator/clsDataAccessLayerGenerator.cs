@@ -282,7 +282,7 @@ namespace CodeGenerator
             bool isFound = false;
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = ""SELECT Found=1 FROM People WHERE {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
+            string query = ""SELECT Found=1 FROM {TableName} WHERE {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
 
             SqlCommand command = new SqlCommand(query, connection);
             command.Parameters.AddWithValue(""@{_PrimaryKeyColumn.ColumnName}"", {_PrimaryKeyColumn.ColumnName});
