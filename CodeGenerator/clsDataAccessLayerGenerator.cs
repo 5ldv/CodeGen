@@ -208,9 +208,6 @@ namespace CodeGenerator
 
             foreach (clsColumn Column in _ColumnsList)
             {
-                if (Column.IsPrimaryKey)
-                    continue;
-
                 sbCommandParameters.Append($"\r\n            command.Parameters.AddWithValue(\"@{Column.ColumnName}\", {Column.ColumnName});");
             }
 
@@ -221,7 +218,7 @@ namespace CodeGenerator
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
             string query = @""UPDATE {TableName}  
                             SET 
-{AssigningValues.Substring(0, AssigningValues.Length - 1)}
+{AssigningValues.Substring(0, AssigningValues.Length - 2)}
                             WHERE {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
 
             SqlCommand command = new SqlCommand(query, connection);
