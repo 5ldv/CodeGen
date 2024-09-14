@@ -170,7 +170,7 @@ namespace CodeGenerator
 
             SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
             string query = @""INSERT INTO {TableName} ({_GetParameterList(false, false, false)})
-                            VALUES (@{_GetParameterList(false, false, false, "@")})
+                            VALUES ({_GetParameterList(false, false, false, "@")})
                             SELECT SCOPE_IDENTITY();"";
 
             SqlCommand command = new SqlCommand(query, connection);
