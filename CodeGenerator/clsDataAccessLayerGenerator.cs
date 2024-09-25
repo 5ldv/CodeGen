@@ -96,54 +96,51 @@ namespace CodeGenerator
 
                 if (Column.AllowNull)
                 {
-                    sbAssignedColumns.Append($"\r\n\r\n                    if(reader[\"{Column.ColumnName}\"] != DBNull.Value)");
-                    sbAssignedColumns.Append($"\r\n                        {Column.ColumnName} = ({Column.ColumnDataType})reader[\"{Column.ColumnName}\"];");
-                    sbAssignedColumns.Append($"\r\n                    else");
-                    sbAssignedColumns.Append($"\r\n                        {Column.ColumnName} = {Column.NullEquivalentValue};\r\n");
+                    sbAssignedColumns.Append($"\r\n\r\n                                if(reader[\"{Column.ColumnName}\"] != DBNull.Value)");
+                    sbAssignedColumns.Append($"\r\n                                    {Column.ColumnName} = ({Column.ColumnDataType})reader[\"{Column.ColumnName}\"];");
+                    sbAssignedColumns.Append($"\r\n                                else");
+                    sbAssignedColumns.Append($"\r\n                                    {Column.ColumnName} = {Column.NullEquivalentValue};\r\n");
                 }
                 else
-                    sbAssignedColumns.Append($"\r\n                    {Column.ColumnName} = ({Column.ColumnDataType})reader[\"{Column.ColumnName}\"];");
+                    sbAssignedColumns.Append($"\r\n                                {Column.ColumnName} = ({Column.ColumnDataType})reader[\"{Column.ColumnName}\"];");
             }
             _sbDataAccessClass.AppendLine($@"        public static bool Get{TableSingularName}ByID({_GetParameterList(true, true)})
         {{
             bool isFound = false;
 
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = ""SELECT * FROM {TableName} WHERE {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
-
-            SqlCommand command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue(""@{_PrimaryKeyColumn.ColumnName}"", {_PrimaryKeyColumn.ColumnName});
-
             try
             {{
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-
-                if(reader.Read())
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {{
-                    isFound = true;
+                    string query = ""SELECT * FROM {TableName} WHERE {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {{
+                        command.Parameters.AddWithValue(""@{_PrimaryKeyColumn.ColumnName}"", {_PrimaryKeyColumn.ColumnName});
+
+                        connection.Open();
+
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {{
+                            if (reader.Read())
+                            {{
+                                isFound = true;
+
 {sbAssignedColumns}
+                            }}
+                            else
+                                isFound = false;
+                        }}
+                    }}
                 }}
-                else
-                {{
-                    isFound = false;
-                }}
-
-                reader.Close();
             }}
-            catch(Exception ex)
+            catch (Exception ex)
             {{
                 isFound = false;
-            }}
-            finally
-            {{
-                connection.Close();
             }}
 
             return isFound;
         }}");
-         
-
         }
         private void _GenerateMethod_AddNewObject()
         {
@@ -157,44 +154,41 @@ namespace CodeGenerator
                 if (Column.AllowNull)
                     sbCommandParameters.Append($@"
 
-            if({Column.ColumnName} != {Column.NullEquivalentValue})
-                command.Parameters.AddWithValue(""@{Column.ColumnName}"", {Column.ColumnName});
-            else
-                command.Parameters.AddWithValue(""@{Column.ColumnName}"", DBNull.Value);");
+                        if({Column.ColumnName} != {Column.NullEquivalentValue})
+                            command.Parameters.AddWithValue(""@{Column.ColumnName}"", {Column.ColumnName});
+                        else
+                            command.Parameters.AddWithValue(""@{Column.ColumnName}"", DBNull.Value);");
                 else
-                    sbCommandParameters.Append($"\r\n            command.Parameters.AddWithValue(\"@{Column.ColumnName}\", {Column.ColumnName});");
-            }
+                    sbCommandParameters.Append($"\r\n                        command.Parameters.AddWithValue(\"@{Column.ColumnName}\", {Column.ColumnName});");
+            } 
             _sbDataAccessClass.AppendLine($@"        public static int AddNew{TableSingularName}({_GetParameterList(false, false)})
         {{
             int {_PrimaryKeyColumn.ColumnName} = -1;
 
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = @""INSERT INTO {TableName} ({_GetParameterList(false, false, false)})
+            try
+            {{
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {{
+                    string query = @""INSERT INTO {TableName} ({_GetParameterList(false, false, false)})
                             VALUES ({_GetParameterList(false, false, false, "@")})
                             SELECT SCOPE_IDENTITY();"";
 
-            SqlCommand command = new SqlCommand(query, connection);
-
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {{
 {sbCommandParameters}
 
-            try
-            {{
-                connection.Open();
+                        connection.Open();
 
-                object result = command.ExecuteScalar();
+                        object result = command.ExecuteScalar();
 
-                if(result != null && int.TryParse(result.ToString(), out int insertedID))
-                {{
-                    {_PrimaryKeyColumn.ColumnName} = insertedID;
+                        if (result != null && int.TryParse(result.ToString(), out int insertedID))
+                            {_PrimaryKeyColumn.ColumnName} = insertedID;
+                    }}
                 }}
             }}
-            catch(Exception ex)
+            catch (Exception ex)
             {{
 
-            }}
-            finally
-            {{
-                connection.Close();
             }}
 
             return {_PrimaryKeyColumn.ColumnName};
@@ -208,35 +202,34 @@ namespace CodeGenerator
 
             foreach (clsColumn Column in _ColumnsList)
             {
-                sbCommandParameters.Append($"\r\n            command.Parameters.AddWithValue(\"@{Column.ColumnName}\", {Column.ColumnName});");
+                sbCommandParameters.Append($"\r\n                        command.Parameters.AddWithValue(\"@{Column.ColumnName}\", {Column.ColumnName});");
             }
 
             _sbDataAccessClass.AppendLine($@"        public static bool Update{TableSingularName}({_GetParameterList(true, false)})
         {{
             int rowsAffected = 0;
 
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = @""UPDATE {TableName}  
+            try
+            {{
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {{
+                    string query = @""UPDATE {TableName}  
                             SET 
 {AssigningValues.Substring(0, AssigningValues.Length - 2)}
                             WHERE {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
 
-            SqlCommand command = new SqlCommand(query, connection);
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {{
 {sbCommandParameters}
 
-            try
-            {{
-                connection.Open();
-                rowsAffected = command.ExecuteNonQuery();
+                        connection.Open();
+                        rowsAffected = command.ExecuteNonQuery();
+                    }}
+                }}
             }}
-            catch(Exception ex)
+            catch (Exception ex)
             {{
                 return false;
-            }}
-
-            finally
-            {{
-                connection.Close();
             }}
 
             return (rowsAffected > 0);
@@ -248,24 +241,26 @@ namespace CodeGenerator
         {{
             int rowsAffected = 0;
 
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = @""Delete {TableName} 
-                                where {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
-
-            SqlCommand command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue(""@{_PrimaryKeyColumn.ColumnName}"", {_PrimaryKeyColumn.ColumnName});
-
             try
             {{
-                connection.Open();
-                rowsAffected = command.ExecuteNonQuery();
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {{
+                    string query = @""Delete {TableName} 
+                                where {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {{
+                        command.Parameters.AddWithValue(""@{_PrimaryKeyColumn.ColumnName}"", {_PrimaryKeyColumn.ColumnName});
+
+                        connection.Open();
+                        rowsAffected = command.ExecuteNonQuery();
+                    }}
+                }}
+
             }}
-            catch(Exception ex)
+            catch (Exception ex)
             {{
-            }}
-            finally
-            {{
-                connection.Close();
+
             }}
 
             return (rowsAffected > 0);
@@ -278,28 +273,26 @@ namespace CodeGenerator
         {{
             bool isFound = false;
 
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = ""SELECT Found=1 FROM {TableName} WHERE {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
-
-            SqlCommand command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue(""@{_PrimaryKeyColumn.ColumnName}"", {_PrimaryKeyColumn.ColumnName});
-
             try
             {{
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {{
+                    string query = ""SELECT Found = 1 FROM {TableName} WHERE {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
 
-                isFound = reader.HasRows;
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {{
+                        command.Parameters.AddWithValue(""@{_PrimaryKeyColumn.ColumnName}"", {_PrimaryKeyColumn.ColumnName});
 
-                reader.Close();
+                        connection.Open();
+                        SqlDataReader reader = command.ExecuteReader();
+
+                        isFound = reader.HasRows;
+                    }}
+                }}
             }}
-            catch(Exception ex)
+            catch (Exception ex)
             {{
                 isFound = false;
-            }}
-            finally
-            {{
-                connection.Close();
             }}
 
             return isFound;
@@ -311,31 +304,25 @@ namespace CodeGenerator
         {{
             DataTable dt = new DataTable();
 
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
-            string query = ""SELECT * FROM {TableName}"";
-
-            SqlCommand command = new SqlCommand(query, connection);
-
             try
             {{
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-
-                if(reader.HasRows)
+                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {{
-                    dt.Load(reader);
+                    string query = ""SELECT * FROM {TableName}"";
+
+                    using (SqlCommand command = new SqlCommand(query, connection))
+                    {{
+                        connection.Open();
+                        SqlDataReader reader = command.ExecuteReader();
+
+                        if (reader.HasRows)
+                            dt.Load(reader);
+                    }}
                 }}
-
-                reader.Close();
             }}
-
-            catch(Exception ex)
+            catch (Exception ex)
             {{
 
-            }}
-            finally
-            {{
-                connection.Close();
             }}
 
             return dt;
