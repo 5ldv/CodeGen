@@ -12,28 +12,50 @@ namespace CodeGen.Global
         public static bool Createfile(string FolderPath, string FileName, string Content)
         {
             string FilePath = Path.Combine(FolderPath, FileName);
+            try
+            {
+                if(File.Exists(FilePath))
+                    return false;
 
-            if (File.Exists(FilePath))
+                File.WriteAllText(FilePath, Content);
+                return true;
+            }
+            catch(Exception ex)
+            {
                 return false;
+            }
 
-            File.WriteAllText(FilePath, Content);
-            return true;
         }
         public static bool DoesFileExist(string FolderPath, string FileName)
         {
             string FilePath = Path.Combine(FolderPath, FileName);
 
-            if (File.Exists(FilePath))
-                return true;
-            else
+            try
+            {
+                if(File.Exists(FilePath))
+                    return true;
+                else
+                    return false;
+            }
+            catch(Exception ex)
+            {
                 return false;
+            }
         }
         public static bool DoesFileExist(string FilePath)
         {
-            if (File.Exists(FilePath))
-                return true;
-            else
+            try
+            {
+                if(File.Exists(FilePath))
+                    return true;
+                else
+                    return false;
+            }
+            catch(Exception ex)
+            {
                 return false;
+            }
+
         }
     }
 }

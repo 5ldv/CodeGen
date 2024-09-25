@@ -10,65 +10,62 @@ namespace CodeGenerator
         public static List<string> GetAllDatabases()
         {
             List<string> Databases = new List<string>();
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
             string query = "SELECT name FROM sys.databases WHERE name NOT IN ('master', 'tempdb', 'model', 'msdb')";
-
-            SqlCommand sqlCommand = new SqlCommand(query, connection);
             try
             {
-                connection.Open();
-                SqlDataReader reader = sqlCommand.ExecuteReader();
-                while(reader.Read())
+                using(SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    Databases.Add(reader["name"].ToString());
+                    using(SqlCommand sqlCommand = new SqlCommand(query, connection))
+                    {
+                        connection.Open();
+                        using(SqlDataReader reader = sqlCommand.ExecuteReader())
+                        {
+                            while(reader.Read())
+                            {
+                                Databases.Add(reader["name"].ToString());
+                            }
+                        }
+                    }
+
                 }
             }
             catch(Exception ex)
             {
 
-            }
-            finally
-            {
-                connection.Close();
             }
             return Databases;
         }
         public static List<string> GetTablesOfDatabase(string Database)
         {
             List<string> TableNames = new List<string>();
-
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
             string query = $"USE {Database} SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_NAME <> 'sysdiagrams' ";
-
-            SqlCommand command = new SqlCommand(query, connection);
-
             try
             {
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-
-                while(reader.Read())
+                using(SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
-                    TableNames.Add(reader["TABLE_NAME"].ToString());
-                }
+                    using(SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        connection.Open();
+                        using(SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while(reader.Read())
+                            {
+                                TableNames.Add(reader["TABLE_NAME"].ToString());
+                            }
+                        }
 
-                reader.Close();
+                    }
+                }
             }
             catch(Exception ex)
             {
-            }
-            finally
-            {
-                connection.Close();
+
             }
             return TableNames;
         }
         public static List<clsColumn> GetColumnsOfTable(string Database, string Table)
         {
-
             List<clsColumn> ColumnsList = new List<clsColumn>();
-
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
             string query = $@"
 USE {Database}
 SELECT COLUMN_NAME AS ColumnName, 
@@ -114,66 +111,59 @@ SELECT COLUMN_NAME AS ColumnName,
        END AS bit) AS IsPrimaryKey
 FROM INFORMATION_SCHEMA.COLUMNS 
 WHERE TABLE_NAME = '{Table}';";
-
-            SqlCommand command = new SqlCommand(query, connection);
-           // command.Parameters.AddWithValue("@Table", Table);
-
             try
             {
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
-
-                while(reader.Read())
+                using(SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {
+                    using(SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        connection.Open();
+                        using(SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while(reader.Read())
+                            {
+                                string ColumnName = reader["ColumnName"].ToString();
+                                string DataType = reader["DataType"].ToString();
+                                bool AllowNull = (bool)reader["AllowNull"];
+                                bool IsPrimaryKey = (bool)reader["IsPrimaryKey"];
 
-
-                    string ColumnName = reader["ColumnName"].ToString();
-                    string DataType = reader["DataType"].ToString();
-                    bool AllowNull = (bool)reader["AllowNull"];
-                    bool IsPrimaryKey = (bool)reader["IsPrimaryKey"];
-
-                    clsColumn Column = new clsColumn(ColumnName, DataType, AllowNull, IsPrimaryKey);
-                    ColumnsList.Add(Column);
+                                clsColumn Column = new clsColumn(ColumnName, DataType, AllowNull, IsPrimaryKey);
+                                ColumnsList.Add(Column);
+                            }
+                        }
+                    }
                 }
-
-                reader.Close();
             }
             catch(Exception ex)
             {
+
             }
-            finally
-            {
-                connection.Close();
-            }
+
             return ColumnsList;
 
         }
         public static bool DoesDatabaseExist(string DatabaseName)
         {
             bool DoesExists = false;
-
-            SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString);
             string query = $"SELECT Found = 1 FROM sys.databases WHERE name = @DatabaseName";
-
-            SqlCommand command = new SqlCommand(query, connection);
-            command.Parameters.AddWithValue("@DatabaseName", DatabaseName);
-
             try
             {
-                connection.Open();
-                SqlDataReader reader = command.ExecuteReader();
+                using(SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                {
+                    using(SqlCommand command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@DatabaseName", DatabaseName);
 
-                DoesExists = reader.HasRows;
+                        connection.Open();
+                        SqlDataReader reader = command.ExecuteReader();
 
-                reader.Close();
+                        DoesExists = reader.HasRows;
+                    }
+                }
             }
             catch(Exception ex)
             {
                 DoesExists = false;
-            }
-            finally
-            {
-                connection.Close();
             }
 
             return DoesExists;
