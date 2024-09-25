@@ -167,13 +167,13 @@ namespace CodeGenerator
 
             try
             {{
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using(SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {{
                     string query = @""INSERT INTO {TableName} ({_GetParameterList(false, false, false)})
                             VALUES ({_GetParameterList(false, false, false, "@")})
                             SELECT SCOPE_IDENTITY();"";
 
-                    using (SqlCommand command = new SqlCommand(query, connection))
+                    using(SqlCommand command = new SqlCommand(query, connection))
                     {{
 {sbCommandParameters}
 
@@ -181,12 +181,12 @@ namespace CodeGenerator
 
                         object result = command.ExecuteScalar();
 
-                        if (result != null && int.TryParse(result.ToString(), out int insertedID))
+                        if(result != null && int.TryParse(result.ToString(), out int insertedID))
                             {_PrimaryKeyColumn.ColumnName} = insertedID;
                     }}
                 }}
             }}
-            catch (Exception ex)
+            catch(Exception ex)
             {{
 
             }}
@@ -211,14 +211,14 @@ namespace CodeGenerator
 
             try
             {{
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using(SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {{
                     string query = @""UPDATE {TableName}  
                             SET 
 {AssigningValues.Substring(0, AssigningValues.Length - 2)}
                             WHERE {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
 
-                    using (SqlCommand command = new SqlCommand(query, connection))
+                    using(SqlCommand command = new SqlCommand(query, connection))
                     {{
 {sbCommandParameters}
 
@@ -227,7 +227,7 @@ namespace CodeGenerator
                     }}
                 }}
             }}
-            catch (Exception ex)
+            catch(Exception ex)
             {{
                 return false;
             }}
@@ -243,12 +243,12 @@ namespace CodeGenerator
 
             try
             {{
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using(SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {{
                     string query = @""Delete {TableName} 
                                 where {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
 
-                    using (SqlCommand command = new SqlCommand(query, connection))
+                    using(SqlCommand command = new SqlCommand(query, connection))
                     {{
                         command.Parameters.AddWithValue(""@{_PrimaryKeyColumn.ColumnName}"", {_PrimaryKeyColumn.ColumnName});
 
@@ -258,7 +258,7 @@ namespace CodeGenerator
                 }}
 
             }}
-            catch (Exception ex)
+            catch(Exception ex)
             {{
 
             }}
@@ -275,11 +275,11 @@ namespace CodeGenerator
 
             try
             {{
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using(SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {{
                     string query = ""SELECT Found = 1 FROM {TableName} WHERE {_PrimaryKeyColumn.ColumnName} = @{_PrimaryKeyColumn.ColumnName}"";
 
-                    using (SqlCommand command = new SqlCommand(query, connection))
+                    using(SqlCommand command = new SqlCommand(query, connection))
                     {{
                         command.Parameters.AddWithValue(""@{_PrimaryKeyColumn.ColumnName}"", {_PrimaryKeyColumn.ColumnName});
 
@@ -290,7 +290,7 @@ namespace CodeGenerator
                     }}
                 }}
             }}
-            catch (Exception ex)
+            catch(Exception ex)
             {{
                 isFound = false;
             }}
@@ -306,21 +306,21 @@ namespace CodeGenerator
 
             try
             {{
-                using (SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
+                using(SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))
                 {{
                     string query = ""SELECT * FROM {TableName}"";
 
-                    using (SqlCommand command = new SqlCommand(query, connection))
+                    using(SqlCommand command = new SqlCommand(query, connection))
                     {{
                         connection.Open();
                         SqlDataReader reader = command.ExecuteReader();
 
-                        if (reader.HasRows)
+                        if(reader.HasRows)
                             dt.Load(reader);
                     }}
                 }}
             }}
-            catch (Exception ex)
+            catch(Exception ex)
             {{
 
             }}

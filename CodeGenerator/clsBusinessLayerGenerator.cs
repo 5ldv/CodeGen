@@ -163,22 +163,6 @@ namespace CodeGenerator
             _sbBusinessClass.Append($"{Parameters.Substring(0, Parameters.Length - 2)});");
             _sbBusinessClass.Append("\r\n        }");
         }
-        private void _GenerateMethod_DeleteObject()
-        {
-            _sbBusinessClass.Append($@"
-        public static bool Delete{TableSingularName}({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
-        {{
-            return cls{TableSingularName}Data.Delete{TableSingularName}({_PrimaryKeyColumn.ColumnName});
-        }}");
-        }
-        private void _GenerateMethod_DoesObjectExist()
-        {
-            _sbBusinessClass.Append($@"
-        public static bool Does{TableSingularName}Exist({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
-        {{
-            return cls{TableSingularName}Data.Does{TableSingularName}Exist({_PrimaryKeyColumn.ColumnName});
-        }}");
-        }
         private void _GenerateMethod_Find()
         {
             _sbBusinessClass.AppendLine($"\r\n        public static {TableClassName} Find({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})");
@@ -221,18 +205,27 @@ namespace CodeGenerator
         }}");
 
         }
+        private void _GenerateMethod_DeleteObject()
+        {
+            _sbBusinessClass.Append($@"
+        public static bool Delete{TableSingularName}({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
+        => cls{TableSingularName}Data.Delete{TableSingularName}({_PrimaryKeyColumn.ColumnName});");
+        }
+        private void _GenerateMethod_DoesObjectExist()
+        {
+            _sbBusinessClass.Append($@"
+        public static bool Does{TableSingularName}Exist({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
+        => cls{TableSingularName}Data.Does{TableSingularName}Exist({_PrimaryKeyColumn.ColumnName});");
+        }
         private void _GenerateGetObjectsMethod()
         {
             _sbBusinessClass.Append($@"
         public static DataTable Get{TableName}()
-        {{
-            return cls{TableSingularName}Data.GetAll{TableName}();
-        }}
-");
+        => cls{TableSingularName}Data.GetAll{TableName}();");
         }
         private void _GenerateClosingCurlyBrackets()
         {
-            _sbBusinessClass.AppendLine("    }");
+            _sbBusinessClass.AppendLine("\r\n    }");
             _sbBusinessClass.AppendLine("}");
         }
         public StringBuilder GenerateClass()
@@ -245,10 +238,10 @@ namespace CodeGenerator
             _GenerateClassConstructor();
             _GenerateAddNewObjectMethod();
             _GenerateUpdateObjectMethod();
-            _GenerateMethod_DeleteObject();
-            _GenerateMethod_DoesObjectExist();
             _GenerateMethod_Find();
             _GenerateSaveMethod();
+            _GenerateMethod_DeleteObject();
+            _GenerateMethod_DoesObjectExist();
             _GenerateGetObjectsMethod();
             _GenerateClosingCurlyBrackets();
             return _sbBusinessClass;
