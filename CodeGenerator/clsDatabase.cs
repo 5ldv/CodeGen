@@ -66,40 +66,41 @@ namespace CodeGenerator
         public static List<clsColumn> GetColumnsOfTable(string Database, string Table)
         {
             List<clsColumn> ColumnsList = new List<clsColumn>();
-            string query = $@"
-USE {Database}
+            string query = $@"USE {Database}
 SELECT COLUMN_NAME AS ColumnName, 
        CASE 
-           WHEN DATA_TYPE = 'nvarchar' THEN 'string'
-           WHEN DATA_TYPE = 'varchar' THEN 'string'
-           WHEN DATA_TYPE = 'char' THEN 'string'
-           WHEN DATA_TYPE = 'text' THEN 'string'
-           WHEN DATA_TYPE = 'nchar' THEN 'string'
+           WHEN DATA_TYPE IN ('nvarchar', 'varchar', 'char', 'text', 'nchar') THEN 'string'
            WHEN DATA_TYPE = 'int' THEN 'int'
            WHEN DATA_TYPE = 'bigint' THEN 'long'
            WHEN DATA_TYPE = 'smallint' THEN 'short'
            WHEN DATA_TYPE = 'tinyint' THEN 'byte'
            WHEN DATA_TYPE = 'bit' THEN 'bool'
-           WHEN DATA_TYPE = 'decimal' THEN 'decimal'
-           WHEN DATA_TYPE = 'numeric' THEN 'decimal'
-           WHEN DATA_TYPE = 'money' THEN 'decimal'
-           WHEN DATA_TYPE = 'smallmoney' THEN 'decimal'
+           WHEN DATA_TYPE IN ('decimal', 'numeric', 'money', 'smallmoney') THEN 'decimal'
            WHEN DATA_TYPE = 'float' THEN 'double'
            WHEN DATA_TYPE = 'real' THEN 'float'
-           WHEN DATA_TYPE = 'datetime' THEN 'DateTime'
-           WHEN DATA_TYPE = 'datetime2' THEN 'DateTime'
-           WHEN DATA_TYPE = 'smalldatetime' THEN 'DateTime'
-           WHEN DATA_TYPE = 'date' THEN 'DateTime'
+           WHEN DATA_TYPE IN ('datetime', 'datetime2', 'smalldatetime', 'date') THEN 'DateTime'
            WHEN DATA_TYPE = 'time' THEN 'TimeSpan'
            WHEN DATA_TYPE = 'uniqueidentifier' THEN 'Guid'
-           WHEN DATA_TYPE = 'binary' THEN 'byte[]'
-           WHEN DATA_TYPE = 'varbinary' THEN 'byte[]'
+           WHEN DATA_TYPE IN ('binary', 'varbinary') THEN 'byte[]'
            ELSE 'object'
+       END + 
+       CASE 
+           WHEN (IS_NULLABLE = 'YES' 
+                 OR COLUMN_NAME IN (
+                     SELECT COLUMN_NAME 
+                     FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 
+                     WHERE OBJECTPROPERTY(OBJECT_ID(CONSTRAINT_NAME), 'IsPrimaryKey') = 1 
+                       AND TABLE_NAME = '{Table}'
+                 )) 
+           THEN '?' 
+           ELSE ''
        END AS DataType,
+       
        CAST(CASE 
            WHEN IS_NULLABLE = 'YES' THEN 1 
            ELSE 0
        END AS bit) AS AllowNull,
+
        CAST(CASE 
            WHEN COLUMN_NAME IN (
                SELECT COLUMN_NAME 
@@ -110,7 +111,8 @@ SELECT COLUMN_NAME AS ColumnName,
            ELSE 0
        END AS bit) AS IsPrimaryKey
 FROM INFORMATION_SCHEMA.COLUMNS 
-WHERE TABLE_NAME = '{Table}';";
+WHERE TABLE_NAME = '{Table}';
+";
             try
             {
                 using(SqlConnection connection = new SqlConnection(clsDataAccessSettings.ConnectionString))

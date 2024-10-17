@@ -36,7 +36,7 @@ namespace CodeGenerator
             if (WithPrimaryKey)
             {
                 if (WithDataType)
-                    ParameterList = _PrimaryKeyColumn.ColumnDataType + " ";
+                    ParameterList = _PrimaryKeyColumn.ColumnDataType + "?" + " ";
 
                 ParameterList += _PrimaryKeyColumn.ColumnName + ", ";
             }

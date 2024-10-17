@@ -24,9 +24,9 @@ namespace CodeGenerator
             this.TableName = TableName;
             _DatabaseName = DatabaseName;
             _ColumnsList = TableColumns;
-            foreach (clsColumn Column in TableColumns)
+            foreach(clsColumn Column in TableColumns)
             {
-                if (Column.IsPrimaryKey)
+                if(Column.IsPrimaryKey)
                     _PrimaryKeyColumn = Column;
             }
 
@@ -38,31 +38,31 @@ namespace CodeGenerator
         private string _GetParameterList(bool WithPrimaryKey, bool WithReferences, bool WithDataType = true, string Prefix = "", bool AssigningValues = false)
         {
             string ParameterList = "";
-            if (WithPrimaryKey)
+            if(WithPrimaryKey)
             {
-                if (WithDataType)
+                if(WithDataType)
                     ParameterList = _PrimaryKeyColumn.ColumnDataType + " ";
 
                 ParameterList += _PrimaryKeyColumn.ColumnName + ", ";
             }
 
-            foreach (clsColumn Column in _ColumnsList)
+            foreach(clsColumn Column in _ColumnsList)
             {
-                if (Column.IsPrimaryKey)
+                if(Column.IsPrimaryKey)
                     continue;
 
-                if (WithReferences)
+                if(WithReferences)
                     ParameterList += "ref ";
 
-                if (WithDataType)
+                if(WithDataType)
                     ParameterList += Column.ColumnDataType + " ";
 
-                if (AssigningValues)
+                if(AssigningValues)
                     ParameterList += "                            " + Column.ColumnName + " = ";
 
                 ParameterList += Prefix + Column.ColumnName + ", ";
 
-                if (AssigningValues)
+                if(AssigningValues)
                 {
                     ParameterList += "\r\n";
 
@@ -89,17 +89,14 @@ namespace CodeGenerator
         {
             StringBuilder sbAssignedColumns = new StringBuilder();
 
-            foreach (clsColumn Column in _ColumnsList)
+            foreach(clsColumn Column in _ColumnsList)
             {
-                if (Column.IsPrimaryKey)
+                if(Column.IsPrimaryKey)
                     continue;
 
-                if (Column.AllowNull)
+                if(Column.AllowNull)
                 {
-                    sbAssignedColumns.Append($"\r\n\r\n                                if(reader[\"{Column.ColumnName}\"] != DBNull.Value)");
-                    sbAssignedColumns.Append($"\r\n                                    {Column.ColumnName} = ({Column.ColumnDataType})reader[\"{Column.ColumnName}\"];");
-                    sbAssignedColumns.Append($"\r\n                                else");
-                    sbAssignedColumns.Append($"\r\n                                    {Column.ColumnName} = {Column.NullEquivalentValue};\r\n");
+                    sbAssignedColumns.Append($"\r\n                                {Column.ColumnName} = (reader[\"{Column.ColumnName}\"] != DBNull.Value) ? ({Column.ColumnDataType})reader[\"{Column.ColumnName}\"] : null;");
                 }
                 else
                     sbAssignedColumns.Append($"\r\n                                {Column.ColumnName} = ({Column.ColumnDataType})reader[\"{Column.ColumnName}\"];");
@@ -116,7 +113,7 @@ namespace CodeGenerator
 
                     using (SqlCommand command = new SqlCommand(query, connection))
                     {{
-                        command.Parameters.AddWithValue(""@{_PrimaryKeyColumn.ColumnName}"", {_PrimaryKeyColumn.ColumnName});
+                        command.Parameters.AddWithValue(""@{_PrimaryKeyColumn.ColumnName}"", (object){_PrimaryKeyColumn.ColumnName} ?? DBNull.Value);
 
                         connection.Open();
 
@@ -146,21 +143,17 @@ namespace CodeGenerator
         {
             StringBuilder sbCommandParameters = new StringBuilder();
 
-            foreach (clsColumn Column in _ColumnsList)
+            foreach(clsColumn Column in _ColumnsList)
             {
-                if (Column.IsPrimaryKey)
+                if(Column.IsPrimaryKey)
                     continue;
 
-                if (Column.AllowNull)
+                if(Column.AllowNull)
                     sbCommandParameters.Append($@"
-
-                        if({Column.ColumnName} != {Column.NullEquivalentValue})
-                            command.Parameters.AddWithValue(""@{Column.ColumnName}"", {Column.ColumnName});
-                        else
-                            command.Parameters.AddWithValue(""@{Column.ColumnName}"", DBNull.Value);");
+                        command.Parameters.AddWithValue(""@{Column.ColumnName}"", (object){Column.ColumnName} ?? DBNull.Value);");
                 else
                     sbCommandParameters.Append($"\r\n                        command.Parameters.AddWithValue(\"@{Column.ColumnName}\", {Column.ColumnName});");
-            } 
+            }
             _sbDataAccessClass.AppendLine($@"        public static int AddNew{TableSingularName}({_GetParameterList(false, false)})
         {{
             int {_PrimaryKeyColumn.ColumnName} = -1;
@@ -200,9 +193,12 @@ namespace CodeGenerator
             string AssigningValues = _GetParameterList(false, false, false, "@", true);
             StringBuilder sbCommandParameters = new StringBuilder();
 
-            foreach (clsColumn Column in _ColumnsList)
+            foreach(clsColumn Column in _ColumnsList)
             {
-                sbCommandParameters.Append($"\r\n                        command.Parameters.AddWithValue(\"@{Column.ColumnName}\", {Column.ColumnName});");
+                if(Column.AllowNull)
+                    sbCommandParameters.Append($"\r\n                        command.Parameters.AddWithValue(\"@{Column.ColumnName}\", (object){Column.ColumnName} ?? DBNull.Value);");
+                else
+                    sbCommandParameters.Append($"\r\n                        command.Parameters.AddWithValue(\"@{Column.ColumnName}\", {Column.ColumnName});");
             }
 
             _sbDataAccessClass.AppendLine($@"        public static bool Update{TableSingularName}({_GetParameterList(true, false)})
@@ -250,7 +246,7 @@ namespace CodeGenerator
 
                     using(SqlCommand command = new SqlCommand(query, connection))
                     {{
-                        command.Parameters.AddWithValue(""@{_PrimaryKeyColumn.ColumnName}"", {_PrimaryKeyColumn.ColumnName});
+                        command.Parameters.AddWithValue(""@{_PrimaryKeyColumn.ColumnName}"", (object){_PrimaryKeyColumn.ColumnName} ?? DBNull.Value);
 
                         connection.Open();
                         rowsAffected = command.ExecuteNonQuery();
@@ -281,7 +277,7 @@ namespace CodeGenerator
 
                     using(SqlCommand command = new SqlCommand(query, connection))
                     {{
-                        command.Parameters.AddWithValue(""@{_PrimaryKeyColumn.ColumnName}"", {_PrimaryKeyColumn.ColumnName});
+                        command.Parameters.AddWithValue(""@{_PrimaryKeyColumn.ColumnName}"", (object){_PrimaryKeyColumn.ColumnName}  ?? DBNull.Value);
 
                         connection.Open();
                         SqlDataReader reader = command.ExecuteReader();

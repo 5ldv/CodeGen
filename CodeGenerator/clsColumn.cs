@@ -9,13 +9,19 @@ namespace CodeGenerator
 {
     public class clsColumn
     {
-        public string ColumnName { get; set; } 
+        public string ColumnName { get; set; }
         public string ColumnDataType { get; set; }
         public bool AllowNull { get; set; }
         public bool IsPrimaryKey { get; set; }
-        public string NullEquivalentValue  {
+        public string NullEquivalentValue
+        {
 
-            get {
+            get
+            {
+                if (AllowNull || IsPrimaryKey) { 
+                return "null";
+                }
+
                 switch (this.ColumnDataType)
                 {
                     case "string":
