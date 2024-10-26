@@ -43,7 +43,7 @@ namespace CodeGenerator
                     case "bool":
                         return "false";
                     case "DateTime":
-                        return "DateTime.MinValue";
+                        return "DateTime.Now";
                     default:
                         return "-1";
                 }
