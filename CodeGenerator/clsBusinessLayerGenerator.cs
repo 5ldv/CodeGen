@@ -153,15 +153,13 @@ namespace CodeGenerator
         private void _GenerateUpdateObjectMethod()
         {
             _sbBusinessClass.AppendLine($"        private bool _Update{TableSingularName}()");
-            _sbBusinessClass.AppendLine("        {");
-            _sbBusinessClass.Append($"            return cls{TableSingularName}Data.Update{TableSingularName}(");
+            _sbBusinessClass.Append($"            => cls{TableSingularName}Data.Update{TableSingularName}(");
             string Parameters = "";
             foreach (clsColumn column in _ColumnsList)
             {
                 Parameters += $"this.{column.ColumnName}, ";
             }
             _sbBusinessClass.Append($"{Parameters.Substring(0, Parameters.Length - 2)});");
-            _sbBusinessClass.Append("\r\n        }");
         }
         private void _GenerateMethod_Find()
         {
@@ -209,19 +207,19 @@ namespace CodeGenerator
         {
             _sbBusinessClass.Append($@"
         public static bool Delete{TableSingularName}({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
-        => cls{TableSingularName}Data.Delete{TableSingularName}({_PrimaryKeyColumn.ColumnName});");
+            => cls{TableSingularName}Data.Delete{TableSingularName}({_PrimaryKeyColumn.ColumnName});");
         }
         private void _GenerateMethod_DoesObjectExist()
         {
             _sbBusinessClass.Append($@"
         public static bool Does{TableSingularName}Exist({_PrimaryKeyColumn.ColumnDataType} {_PrimaryKeyColumn.ColumnName})
-        => cls{TableSingularName}Data.Does{TableSingularName}Exist({_PrimaryKeyColumn.ColumnName});");
+            => cls{TableSingularName}Data.Does{TableSingularName}Exist({_PrimaryKeyColumn.ColumnName});");
         }
         private void _GenerateGetObjectsMethod()
         {
             _sbBusinessClass.Append($@"
         public static DataTable Get{TableName}()
-        => cls{TableSingularName}Data.GetAll{TableName}();");
+            => cls{TableSingularName}Data.GetAll{TableName}();");
         }
         private void _GenerateClosingCurlyBrackets()
         {
