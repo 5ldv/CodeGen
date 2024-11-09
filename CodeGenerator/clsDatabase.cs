@@ -85,7 +85,7 @@ SELECT COLUMN_NAME AS ColumnName,
            ELSE 'object'
        END + 
        CASE 
-           WHEN (IS_NULLABLE = 'YES' 
+           WHEN ((IS_NULLABLE = 'YES' AND DATA_TYPE NOT IN ('nvarchar', 'varchar', 'char', 'text', 'nchar')) 
                  OR COLUMN_NAME IN (
                      SELECT COLUMN_NAME 
                      FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE 

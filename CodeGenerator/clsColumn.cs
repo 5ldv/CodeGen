@@ -21,11 +21,11 @@ namespace CodeGenerator
                 if (AllowNull || IsPrimaryKey) { 
                 return "null";
                 }
-
+                
                 switch (this.ColumnDataType)
                 {
                     case "string":
-                        return "\"\"";
+                        return "string.Empty";
                     case "char":
                         return @"'\0'";
                     case "int":
