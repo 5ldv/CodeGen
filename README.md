@@ -1,31 +1,31 @@
+# ⚡ CodeGen: C# Code Generator
+
+**CodeGen** is a C# tool designed to automate the generation of code for the data access and business logic layers in CRUD operations, perfect for 3-tier architecture projects. It simplifies development by quickly creating the necessary components for interacting with databases and managing business logic.
+
 ![Banner](https://github.com/user-attachments/assets/eff9ae16-ee80-441a-9048-3968af86b612)
 
-**CodeGen** is a C# code generator designed to streamline the development of data access and business layers for CRUD operations in a 3-tier architecture. This tool simplifies the process of building and managing the data access and business logic layers by automating the generation of code for Create, Read, Update, and Delete operations.
+## 📸 Preview
+![CodeGen Demo](https://github.com/user-attachments/assets/28517a18-ba03-4cdd-ace2-67ac58a5ce57)
 
-## Demo:
-![CodeGen_akoL7xkw0h](https://github.com/user-attachments/assets/28517a18-ba03-4cdd-ace2-67ac58a5ce57)
+## ✨ Key Features
+- **Data Access Layer Generation** – Automatically generates SQL Server data access code.
+- **Business Layer Generation** – Creates business logic to handle CRUD operations.
+- **Bulk Generation** – Generates code for an entire database in under 15 seconds.
 
-## Features:
-- **Data Access Layer Generation:** Automatically generates code for accessing your SQL Server database.
-- **Business Layer Generation:** Generates the business logic layer to handle CRUD operations.
-- **Bulk Generation:** Efficiently generates code for entire database in under 15 seconds.
+## 🛠️ Technologies Used
+- **Programming Language:** C#
+- **Framework:** .NET Framework (4.8)
+- **Database:** SQL Server
+- **Data Access:** ADO.NET
+- **Deployment:** Desktop (Local Machine)
 
-
-## Getting Started:
-1. **Prerequisites:**
-Microsoft Visual Studio
-.NET Framework
-
-2. **Clone the Repository:**
-Use Git to clone this repository:
-```bash
+## 🛠️ Installation
+1. **Clone the Repository:**
+   ```bash
    git clone https://github.com/5ldv/CodeGen.git
-```
-3. **Open in Visual Studio:**
-Open `CodeGen.sln` in Visual Studio and build the project.
-
-4. **Enojy skipping Donkeywork :)**
-
-## Contributing:
-Contributions are welcome! If you have suggestions for improvements or bug fixes, please submit a pull request or open an issue on GitHub.
-
+   ```
+2. **Open the Project in Visual Studio:**
+   - Open `CodeGen.sln` in Visual Studio.
+   - Build and run the solution.
+---
+💡 *Feel free to contribute or suggest improvements!*
